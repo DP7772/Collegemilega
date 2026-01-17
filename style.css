@@ -1,0 +1,310 @@
+/* --- 1. BASIC RESET --- */
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: black;
+    font-family: 'Courier New', Courier, monospace;
+    display: flex; justify-content: center; align-items: center;
+    height: 100vh; color: white;
+}
+
+canvas { position: absolute; top: 0; left: 0; z-index: 0; }
+
+/* --- 2. START SCREEN --- */
+#start-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: black; z-index: 100;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    transition: opacity 0.5s ease;
+}
+#start-btn {
+    background: transparent; border: 2px solid cyan; color: cyan;
+    padding: 15px 40px; font-size: 1.5rem; cursor: pointer;
+    box-shadow: 0 0 15px cyan; transition: all 0.3s;
+    font-family: inherit; letter-spacing: 2px;
+}
+#start-btn:hover { background: cyan; color: black; box-shadow: 0 0 40px cyan; }
+
+/* --- 3. SWORD DESIGN & ANIMATIONS --- */
+.sword-container {
+    position: relative; z-index: 10;
+    filter: drop-shadow(0 0 20px cyan);
+    opacity: 0; /* JS will make visible */
+    transition: opacity 0.5s;
+}
+
+/* Animations Classes */
+.sword-container.animate-drop {
+    animation: dropSword 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+.sword-container.launching {
+    animation: rocketLaunch 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
+}
+
+/* Blade */
+.blade {
+    width: 14px; height: 350px;
+    background: linear-gradient(90deg, #fff, #a5f3fc, #fff);
+    margin: 0 auto; border-radius: 50% 50% 2px 2px;
+    box-shadow: 0 0 15px cyan, inset 0 0 10px white;
+    position: relative; transition: all 0.3s;
+}
+
+/* Core Energy (Line inside blade) */
+.core-energy {
+    width: 4px; height: 100%; background: red;
+    margin: 0 auto; opacity: 0.8;
+    box-shadow: 0 0 8px red;
+    animation: pulseRed 0.2s infinite alternate;
+    transition: all 0.3s;
+}
+
+/* Guard & Logo */
+.guard {
+    width: 70px; height: 18px; background: #222;
+    margin: 0 auto; border: 2px solid cyan; border-radius: 4px;
+    box-shadow: 0 0 15px cyan; display: flex;
+    justify-content: center; align-items: center;
+    position: relative; z-index: 5;
+}
+.ak-logo {
+    color: #ff0055; font-size: 14px; font-weight: 900;
+    text-shadow: 0 0 5px #ff0055; letter-spacing: 1px;
+}
+
+/* Handle */
+.handle {
+    width: 12px; height: 90px; background: #111;
+    margin: 0 auto; border: 1px solid #444;
+    display: flex; flex-direction: column; justify-content: space-evenly;
+}
+.grip { width: 100%; height: 2px; background: #444; }
+
+/* --- 4. MAGMA & EFFECTS --- */
+.magma-core {
+    position: absolute; bottom: -100px; left: 50%;
+    transform: translateX(-50%); width: 10px; height: 10px;
+    border-radius: 50%; background: radial-gradient(circle, yellow, red, transparent);
+    z-index: 5; opacity: 0; transition: all 1s ease;
+}
+.magma-core.active {
+    width: 500px; height: 150px; opacity: 0.8;
+    bottom: -40px; filter: blur(30px);
+    animation: lavaFlow 2s infinite alternate;
+}
+
+.white-flash {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background: white; z-index: 200; pointer-events: none;
+    animation: flashAnim 1s ease-out forwards;
+}
+
+/* --- 5. TEXT & HUD --- */
+.title-text {
+    position: absolute; z-index: 20; top: 20%;
+    font-size: 4rem; font-weight: bold;
+    text-transform: uppercase; letter-spacing: 12px;
+    text-align: center;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+    opacity: 0; transition: opacity 1s;
+}
+.title-text.visible { opacity: 1; }
+.subtitle { font-size: 1.2rem; color: cyan; letter-spacing: 5px; margin-top: 10px; }
+
+.hud-container {
+    position: absolute; bottom: 50px; z-index: 30;
+    display: flex; flex-direction: column; align-items: center; gap: 20px;
+    opacity: 0; transition: opacity 1s ease; pointer-events: none;
+}
+.hud-container.visible { opacity: 1; pointer-events: all; }
+
+.hud-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+.hud-box {
+    background: rgba(0, 20, 40, 0.8); border: 1px solid #444;
+    padding: 10px; border-radius: 6px; width: 160px;
+    display: flex; flex-direction: column; transition: all 0.3s;
+}
+.hud-box.filled { border-color: cyan; box-shadow: 0 0 10px rgba(0,255,255,0.2); }
+.hud-box label { font-size: 0.7rem; color: #888; margin-bottom: 5px; }
+
+input, select {
+    background: transparent; border: none; border-bottom: 1px solid #555;
+    color: white; font-family: inherit; font-size: 1rem; width: 100%; outline: none;
+}
+option { background: black; }
+
+#launch-btn {
+    background: transparent; border: 2px solid #333; color: #333;
+    padding: 12px 40px; font-weight: bold; letter-spacing: 2px;
+    cursor: not-allowed; transition: all 0.3s;
+}
+#launch-btn.active {
+    border-color: red; color: white; background: red;
+    box-shadow: 0 0 30px red; cursor: pointer;
+    animation: btnPulse 0.5s infinite alternate;
+}
+
+/* --- 6. SPACE RESULTS VIEW --- */
+#space-view {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 50; display: flex; justify-content: center; align-items: center;
+    opacity: 0; transition: opacity 1s; pointer-events: none;
+}
+#space-view.visible { opacity: 1; pointer-events: all; }
+
+.honeycomb-grid {
+    display: flex; flex-wrap: wrap; width: 800px; justify-content: center;
+    perspective: 1000px;
+}
+
+.hex {
+    width: 100px; height: 110px;
+    background: rgba(0, 20, 40, 0.8); border: 1px solid cyan;
+    margin: 10px; display: flex; justify-content: center; align-items: center;
+    text-align: center; color: cyan; font-size: 0.8rem; cursor: pointer;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    opacity: 0; transform: translateZ(-500px) scale(0);
+}
+.hex.show { animation: bigBang 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+.hex:hover { background: cyan; color: black; transform: scale(1.2) !important; z-index: 10; box-shadow: 0 0 30px cyan; }
+
+/* Navigation Buttons */
+.space-controls {
+    position: absolute; bottom: 20px; width: 100%;
+    display: flex; justify-content: center; gap: 20px; z-index: 60;
+}
+.nav-btn {
+    background: rgba(0, 0, 0, 0.8); border: 1px solid cyan; color: cyan;
+    padding: 10px 20px; cursor: pointer; font-family: inherit; font-weight: bold;
+    transition: all 0.3s;
+}
+.nav-btn:hover { background: cyan; color: black; box-shadow: 0 0 20px cyan; }
+.nav-btn.red { border-color: red; color: red; }
+.nav-btn.red:hover { background: red; color: white; box-shadow: 0 0 20px red; }
+.nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+#college-details-panel {
+    position: absolute; bottom: 80px; width: 300px; padding: 20px;
+    background: rgba(0,0,0,0.9); border: 2px solid cyan; color: white;
+    text-align: center; display: none; box-shadow: 0 0 50px rgba(0,255,255,0.3); z-index: 70;
+}
+
+/* --- KEYFRAMES --- */
+@keyframes dropSword { 0% { transform: translateY(-1000px) rotate(180deg); opacity: 0; } 100% { transform: translateY(0) rotate(0deg); opacity: 1; } }
+@keyframes rocketLaunch { 0% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 20px red); } 40% { transform: translateY(50px) scale(0.9); } 100% { transform: translateY(-2000px) scale(0.5); opacity: 0; } }
+@keyframes flashAnim { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes bigBang { to { opacity: 1; transform: translateZ(0) scale(1); } }
+@keyframes pulseRed { from { box-shadow: 0 0 5px red; } to { box-shadow: 0 0 20px red; } }
+@keyframes lavaFlow { from { opacity: 0.5; transform: translateX(-50%) scale(1); } to { opacity: 0.9; transform: translateX(-50%) scale(1.1); } }
+@keyframes btnPulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+
+.shake { animation: shakeScreen 0.5s ease-in-out; }
+@keyframes shakeScreen { 0%,100% { transform: translate(0,0); } 25% { transform: translate(-5px, 5px); } 75% { transform: translate(5px, -5px); } }
+
+/* Levels Styling */
+.sword-container.level-1 .core-energy { background: cyan; box-shadow: 0 0 10px cyan; }
+.sword-container.level-2 .blade { box-shadow: 0 0 25px cyan, inset 0 0 15px white; }
+.sword-container.level-3 .core-energy { background: orange; box-shadow: 0 0 30px orange; }
+.sword-container.level-4 .blade { box-shadow: 0 0 50px red, inset 0 0 20px red; border-color: red; }
+.sword-container.level-4 .core-energy { background: white; box-shadow: 0 0 50px red; }
+.sword-container.level-4 { animation: shakeScreen 0.2s infinite; }
+
+/* --- CYBER NAVBAR --- */
+.cyber-nav {
+    position: fixed; top: 0; left: 0; width: 100%;
+    height: 60px;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 40px; box-sizing: border-box;
+    z-index: 200; /* Sword se upar dikhna chahiye */
+    background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+    border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+    backdrop-filter: blur(2px);
+}
+
+.nav-brand {
+    font-size: 1.2rem; color: cyan; font-weight: bold; letter-spacing: 2px;
+    text-shadow: 0 0 5px cyan;
+}
+
+.nav-links { list-style: none; display: flex; gap: 30px; }
+.nav-item {
+    text-decoration: none; color: #aaa; font-size: 0.9rem; letter-spacing: 1px;
+    transition: all 0.3s; position: relative;
+}
+.nav-item:hover, .nav-item.active {
+    color: white; text-shadow: 0 0 10px cyan;
+}
+.nav-item::after {
+    content: ''; position: absolute; width: 0; height: 2px;
+    bottom: -5px; left: 0; background: cyan; transition: width 0.3s;
+}
+.nav-item:hover::after { width: 100%; }
+
+/* --- ABOUT MODAL (TERMINAL STYLE - FIXED SCROLL) --- */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85); z-index: 500;
+    display: flex; justify-content: center; align-items: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.modal-overlay.active { opacity: 1; pointer-events: all; }
+
+.modal-terminal {
+    width: 600px; height: 400px; /* Fixed Height */
+    background: #050505; border: 2px solid cyan;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+    position: relative; 
+    display: flex; flex-direction: column; /* Header aur Body ko stack karne ke liye */
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.terminal-header {
+    background: rgba(0, 255, 255, 0.2); padding: 10px;
+    border-bottom: 1px solid cyan; color: cyan;
+    display: flex; justify-content: space-between; font-weight: bold;
+    flex-shrink: 0; /* Header size fix rahega */
+}
+
+.close-btn {
+    background: transparent; border: none; color: red;
+    font-weight: bold; cursor: pointer; font-size: 1.2rem;
+}
+
+/* --- YAHAN CHANGE KIYA HAI (SCROLL LOGIC) --- */
+.terminal-body { 
+    padding: 20px; 
+    color: #0f0; 
+    font-size: 1rem; 
+    line-height: 1.6;
+    flex-grow: 1; /* Bacha hua pura space lega */
+    overflow-y: auto; /* SCROLL ENABLED HERE */
+    
+    /* Scrollbar Styling for Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: cyan #000;
+}
+
+/* Scrollbar Styling for Chrome/Safari/Edge */
+.terminal-body::-webkit-scrollbar {
+    width: 8px;
+}
+.terminal-body::-webkit-scrollbar-track {
+    background: #000; 
+}
+.terminal-body::-webkit-scrollbar-thumb {
+    background: cyan; 
+    border-radius: 4px;
+}
+.terminal-body::-webkit-scrollbar-thumb:hover {
+    background: #00ffaa; 
+}
+
+/* Scanline Effect */
+.scan-line {
+    position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+    background: rgba(0, 255, 0, 0.3); opacity: 0.5;
+    animation: scan 3s linear infinite; pointer-events: none;
+    z-index: 10;
+}
+@keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
