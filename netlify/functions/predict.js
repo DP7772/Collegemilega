@@ -2,7 +2,7 @@ const { Client } = require('pg');
 
 exports.handler = async (event, context) => {
     
-    // 1. Headers (CORS)
+    // 1. Headers & Method Check
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
@@ -20,28 +20,39 @@ exports.handler = async (event, context) => {
     });
 
     try {
-        const body = JSON.parse(event.body);
-        const { rank, caste, course, quota } = body;
-        const userRank = parseInt(rank); // User rank ko number bana diya
+        let { rank, caste, course, quota } = JSON.parse(event.body);
+        const userRank = parseInt(rank);
+
+        // --- SMART MAPPING (Spelling Fixer) ---
+        // Agar user "GEN" bheje, toh DB me "OPEN" dhoondo
+        if (caste.toUpperCase() === 'GEN') caste = 'OPEN';
+        if (caste.toUpperCase() === 'TFWS') caste = 'TFW';
+        
+        // Quota fix
+        if (quota.toUpperCase() === 'JEE MAIN') quota = 'AI'; // Check DB if it uses 'All India' or 'AI'
+        if (quota.toUpperCase() === 'GUJCET') quota = 'HS';   // Check DB if it uses 'Home State' or 'HS' or 'GUJCET'
+
+        console.log(`🔍 Searching For: ${course} | ${caste} | ${quota} | Rank: ${userRank}`);
 
         await client.connect();
 
-        // --- SQL QUERY (CASE INSENSITIVE) ---
-        // ILIKE ka matlab: 'Computer' aur 'COMPUTER' dono same maane jayenge.
-        // Hum rank filter nahi kar rahe, wo niche JS me karenge taaki 'N/A' na aaye.
+        // --- SQL QUERY (FLEXIBLE SEARCH) ---
+        // Hum OR condition laga rahe hain taaki agar quota 'AI' ya 'All India' ho to dono pakad le
         const query = `
             SELECT inst_name, year, closing_rank, opening_rank, inst_type 
             FROM college_cutoffs 
             WHERE 
                 course_name ILIKE $1 
                 AND category ILIKE $2 
-                AND quota ILIKE $3
+                AND (quota ILIKE $3 OR quota ILIKE 'All India' OR quota ILIKE 'Home State')
             ORDER BY closing_rank ASC
         `;
 
-        // Input ke aage peeche space hata di (trim)
+        // Note: Hum quota ko flexible rakh rahe hain query me
         const values = [course.trim(), caste.trim(), quota.trim()];
         const result = await client.query(query, values);
+
+        console.log(`✅ Rows Found in DB: ${result.rowCount}`);
 
         // --- DATA GROUPING ---
         const collegeMap = {};
@@ -55,7 +66,8 @@ exports.handler = async (event, context) => {
                     2025: null
                 };
             }
-            // Data store kar rahe hain
+            
+            // Year check
             if (row.year == 2024 || row.year == '2024') {
                 collegeMap[name][2024] = { open: row.opening_rank, close: row.closing_rank };
             } else if (row.year == 2025 || row.year == '2025') {
@@ -63,36 +75,31 @@ exports.handler = async (event, context) => {
             }
         });
 
-        // --- TERA STRICT LOGIC (13000 vs 13500) ---
+        // --- STRICT FILTERING (User Logic) ---
         const finalColleges = [];
 
         Object.keys(collegeMap).forEach(name => {
             const d = collegeMap[name];
 
-            // Pehle check kar ki Dono saal ka data hai ya nahi?
+            // 1. Data Check: Dono saal ka data hona chahiye
             if (d[2024] && d[2025]) {
                 
-                // Database se values nikal ke Number me convert karo (Safety ke liye)
                 const close24 = parseInt(d[2024].close);
                 const close25 = parseInt(d[2025].close);
 
-                // LOGIC: 
-                // 13000 <= 13500 (TRUE)  &&  13000 <= 13300 (TRUE)
-                // Agar dono true hain, toh college dikhao.
+                // 2. Rank Check: User ka Rank cutoffs se kam hona chahiye
                 if (userRank <= close24 && userRank <= close25) {
-                    
                     finalColleges.push({
                         name: name,
                         type: d.type,
                         status: 'safe',
-                        details: { 
-                            y24: d[2024],
-                            y25: d[2025]
-                        }
+                        details: { y24: d[2024], y25: d[2025] }
                     });
                 }
             }
         });
+
+        console.log(`🚀 Sending ${finalColleges.length} Colleges`);
 
         await client.end();
 
