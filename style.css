@@ -308,3 +308,51 @@ option { background: black; }
     z-index: 10;
 }
 @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+
+/* --- ENHANCED DETAILS PANEL --- */
+#college-details-panel {
+    position: absolute; 
+    top: 50%; left: 50%; transform: translate(-50%, -50%); /* Center Screen */
+    width: 90%; max-width: 500px;
+    padding: 30px;
+    background: rgba(0, 10, 20, 0.95);
+    border: 2px solid cyan;
+    box-shadow: 0 0 50px rgba(0, 255, 255, 0.2);
+    z-index: 1000;
+    text-align: left; /* Text align left for data */
+    display: none; /* Hidden by default */
+}
+
+#college-details-panel h2 {
+    color: cyan; margin-top: 0; text-align: center;
+    border-bottom: 1px solid #333; padding-bottom: 15px;
+}
+
+.detail-row {
+    display: flex; justify-content: space-between;
+    margin: 10px 0; border-bottom: 1px solid #333;
+    padding-bottom: 5px; font-size: 0.9rem;
+}
+
+.detail-label { color: #888; }
+.detail-value { color: white; font-weight: bold; }
+
+.year-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin-top: 20px;
+}
+
+.year-box {
+    border: 1px solid #444; padding: 10px;
+    text-align: center; background: rgba(0,0,0,0.5);
+}
+
+.year-title { color: orange; font-size: 0.8rem; margin-bottom: 5px; display: block;}
+.rank-data { font-size: 1.1rem; color: #fff; font-family: monospace; }
+
+#close-panel-btn {
+    width: 100%; background: red; color: white; border: none;
+    padding: 12px; margin-top: 20px; cursor: pointer;
+    font-weight: bold; letter-spacing: 2px;
+}
+#close-panel-btn:hover { background: #ff4444; box-shadow: 0 0 15px red; }
