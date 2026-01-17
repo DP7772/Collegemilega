@@ -14,43 +14,31 @@ document.addEventListener("DOMContentLoaded", () => {
     const spaceView = document.getElementById('space-view');
     const honeycomb = document.getElementById('honeycomb');
     
-    // New Buttons
+    // Controls
     const nextBtn = document.getElementById('next-btn');
     const prevBtn = document.getElementById('prev-btn');
     const backBtn = document.getElementById('back-btn');
+    const filterContainer = document.querySelector('.filter-container'); // To hide filters
 
     // Logic Variables
     let currentPage = 0;
     const itemsPerPage = 15;
-    // 60 Dummy Colleges for Pagination
-    const allColleges = Array.from({ length: 60 }, (_, i) => `Universe College ${i + 1} - System X`);
+    let liveData = []; // Backend data yahan aayega
 
     // --- 2. SOUND HANDLER ---
     const playSound = (file) => {
         const audio = new Audio(file);
-        audio.play().catch(e => console.log("Audio Blocked/Missing:", file));
+        audio.play().catch(e => {}); // Silent catch
     };
 
     // --- 3. STARFIELD BACKGROUND ---
     const setSize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-    setSize();
-    window.addEventListener('resize', setSize);
-
-    const stars = Array.from({ length: 300 }).map(() => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        size: Math.random() * 2,
-        speed: Math.random() * 3 + 0.5
-    }));
-
+    setSize(); window.addEventListener('resize', setSize);
+    const stars = Array.from({ length: 300 }).map(() => ({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 2, speed: Math.random() * 3 + 0.5 }));
     function animateStars() {
         ctx.fillStyle = 'black'; ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = 'white';
-        stars.forEach(star => {
-            ctx.beginPath(); ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2); ctx.fill();
-            star.y -= star.speed;
-            if(star.y < 0) { star.y = canvas.height; star.x = Math.random() * canvas.width; }
-        });
+        stars.forEach(star => { ctx.beginPath(); ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2); ctx.fill(); star.y -= star.speed; if(star.y < 0) { star.y = canvas.height; star.x = Math.random() * canvas.width; } });
         requestAnimationFrame(animateStars);
     }
     animateStars();
@@ -59,104 +47,118 @@ document.addEventListener("DOMContentLoaded", () => {
     startBtn.addEventListener('click', () => {
         startScreen.style.opacity = '0';
         setTimeout(() => { startScreen.style.display = 'none'; }, 500);
-
         sword.classList.add('animate-drop');
-
         setTimeout(() => {
             document.body.classList.add('shake');
-            playSound('Cinematic Boom.wav'); // SOUND 1: DHADAAM
-            
+            playSound('Cinematic Boom.wav');
             mainText.classList.add('visible');
             setTimeout(() => { hud.classList.add('visible'); }, 1000);
             setTimeout(() => { document.body.classList.remove('shake'); }, 500);
         }, 1500);
     });
 
-    // --- 5. INPUT & MAGMA LOGIC ---
-    const inputs = [
-        document.getElementById('input-rank'),
-        document.getElementById('input-caste'),
-        document.getElementById('input-course'),
-        document.getElementById('input-quota')
-    ];
-
+    // --- 5. INPUT CHECK ---
+    const inputs = document.querySelectorAll('input, select');
     function checkInputs() {
         let filledCount = 0;
         inputs.forEach(input => {
-            if(input.value !== "") {
-                filledCount++;
-                input.parentElement.classList.add('filled');
-            } else {
-                input.parentElement.classList.remove('filled');
-            }
+            if(input.value !== "") { filledCount++; input.parentElement.classList.add('filled'); }
+            else { input.parentElement.classList.remove('filled'); }
         });
-
-        // Reset Sword
         sword.classList.remove('level-1', 'level-2', 'level-3', 'level-4');
-
         if(filledCount >= 1) sword.classList.add('level-1');
         if(filledCount >= 2) sword.classList.add('level-2');
         if(filledCount >= 3) sword.classList.add('level-3');
         if(filledCount === 4) {
-            sword.classList.add('level-4');
-            magma.classList.add('active'); // LAVA ON
-            launchBtn.classList.add('active'); // BUTTON ON
+            sword.classList.add('level-4'); magma.classList.add('active'); launchBtn.classList.add('active');
         } else {
-            magma.classList.remove('active');
-            launchBtn.classList.remove('active');
+            magma.classList.remove('active'); launchBtn.classList.remove('active');
         }
     }
     inputs.forEach(inp => { inp.addEventListener('input', checkInputs); inp.addEventListener('change', checkInputs); });
 
-    // --- 6. LAUNCH SEQUENCE ---
+    // --- 6. LAUNCH & FETCH DATA ---
     launchBtn.addEventListener('click', () => {
         if(!launchBtn.classList.contains('active')) return;
 
-        playSound('Swoosh.wav'); // SOUND 2: SWOOSH
-
-        hud.style.opacity = '0';
-        mainText.style.opacity = '0';
-        magma.style.opacity = '0';
+        playSound('Swoosh.wav');
+        hud.style.opacity = '0'; mainText.style.opacity = '0'; magma.style.opacity = '0';
+        
+        // Hide Filters initially (Confirmed only mode)
+        if(filterContainer) filterContainer.style.display = 'none';
 
         sword.classList.add('launching');
 
         setTimeout(() => {
-            const flash = document.createElement('div');
-            flash.classList.add('white-flash');
-            document.body.appendChild(flash);
-            
+            const f = document.createElement('div'); f.className = 'white-flash'; document.body.appendChild(f);
             setTimeout(() => { sword.style.display = 'none'; }, 500);
-            setTimeout(() => { flash.remove(); }, 1000);
+            setTimeout(() => { f.remove(); }, 1000);
         }, 600);
 
-        setTimeout(() => {
-            showSpacePage(0); // Load Results
-            spaceView.classList.add('visible');
-        }, 1500);
+        // --- FETCH START ---
+        const requestData = {
+            rank: document.getElementById('input-rank').value,
+            caste: document.getElementById('input-caste').value,
+            course: document.getElementById('input-course').value,
+            quota: document.getElementById('input-quota').value
+        };
+
+        fetch('/.netlify/functions/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                liveData = data.data; // Store Backend Data
+                currentPage = 0;
+                renderSpaceGrid(); 
+                spaceView.classList.add('visible');
+                
+                // Agar koi college nahi mila
+                if(liveData.length === 0) {
+                    alert("No Confirmed Colleges found for this Rank. Try editing inputs.");
+                    backBtn.click();
+                }
+            } else {
+                alert("System Error: " + (data.error || "Unknown"));
+                backBtn.click();
+            }
+        })
+        .catch(err => {
+            console.error("Fetch Error:", err);
+            alert("Connection Failed. Check Internet.");
+            backBtn.click();
+        });
     });
 
-    // --- 7. SPACE NAVIGATION & PAGINATION ---
-    function showSpacePage(pageIndex) {
-        currentPage = pageIndex;
+    // --- 7. RENDER RESULTS ---
+    function renderSpaceGrid() {
         honeycomb.innerHTML = "";
         
-        const start = pageIndex * itemsPerPage;
+        const start = currentPage * itemsPerPage;
         const end = start + itemsPerPage;
-        const pageItems = allColleges.slice(start, end);
+        const pageItems = liveData.slice(start, end);
 
         prevBtn.disabled = currentPage === 0;
-        nextBtn.disabled = end >= allColleges.length;
+        nextBtn.disabled = end >= liveData.length;
 
         pageItems.forEach((col, index) => {
             const hex = document.createElement('div');
-            hex.classList.add('hex');
-            hex.innerText = col;
+            // 'safe' class for Green color
+            hex.className = `hex safe`; 
+            hex.innerText = col.name;
             hex.style.animationDelay = `${index * 0.1}s`; 
             
             setTimeout(() => { hex.classList.add('show'); }, 50);
             
             hex.addEventListener('click', () => {
-                document.getElementById('col-name').innerText = col;
+                document.getElementById('col-name').innerText = col.name;
+                const statusElem = document.getElementById('col-status');
+                statusElem.innerText = col.desc;
+                statusElem.style.color = 'cyan'; // Green/Cyan for safe
+                
                 document.getElementById('college-details-panel').style.display = 'block';
                 playSound('ui_click.mp3');
             });
@@ -164,10 +166,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    nextBtn.addEventListener('click', () => { showSpacePage(currentPage + 1); });
-    prevBtn.addEventListener('click', () => { showSpacePage(currentPage - 1); });
+    nextBtn.addEventListener('click', () => { playSound('Sci-Fi.wav'); currentPage++; renderSpaceGrid(); });
+    prevBtn.addEventListener('click', () => { playSound('Sci-Fi.wav'); currentPage--; renderSpaceGrid(); });
 
-    // --- 8. RETURN TO EARTH (BACK BUTTON) ---
+    // --- 8. RETURN ---
     backBtn.addEventListener('click', () => {
         playSound('Swoosh.wav');
         spaceView.classList.remove('visible');
@@ -177,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
             sword.style.display = 'block';
             sword.classList.remove('launching');
             sword.classList.remove('animate-drop');
-            void sword.offsetWidth; // Reset Animation
+            void sword.offsetWidth; 
             
             hud.style.opacity = '1';
             mainText.style.opacity = '1';
@@ -185,59 +187,31 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 800);
     });
 
-    // Close Details Panel
-    window.closePanel = () => {
-        document.getElementById('college-details-panel').style.display = 'none';
-    };
+    window.closePanel = () => { document.getElementById('college-details-panel').style.display = 'none'; };
 
-    // --- 9. NAVBAR & ABOUT LOGIC ---
+    // --- 9. NAVBAR & MISSION LOG ---
     const aboutBtn = document.getElementById('open-about');
     const closeAboutBtn = document.getElementById('close-about');
     const aboutModal = document.getElementById('about-modal');
     const typingArea = document.getElementById('typing-area');
     
-    // *** UPDATED MISSION LOG TEXT ***
-    const aboutText = `> SYSTEM: COLLEGEMILEGA PROTOCOL\n> DATA: 2024-25 MERIT LIST\n> MISSION: Decrypting academic futures based on historical merit data.\n\n> HOW TO USE:\n1. Enter Rank.\n2. Select Details.\n3. Choose Course.\n4. Click CHECK FUTURE.\n\n> RESULTS GUIDE:\n[GREEN] = SAFE ZONE (High Probability)\n[ORANGE] = BORDERLINE (50-50 Chance)\n\n> STATUS: ONLINE_`;
+    const aboutText = `> SYSTEM: COLLEGEMILEGA PROTOCOL\n> DATA: 2024-25 MERIT LIST\n> MISSION: Showing CONFIRMED admissions based on historical data.\n\n> HOW TO USE:\n1. Enter Rank.\n2. Select Details.\n3. Choose Course.\n4. Click CHECK FUTURE.\n\n> NOTE: Only colleges with high probability are displayed.\n\n> STATUS: ONLINE_`;
 
-    let i = 0;
-    let typingInterval;
-
+    let i = 0; let typingInterval;
     function typeWriter() {
         if (i < aboutText.length) {
-            // New line handling
-            if(aboutText.charAt(i) === '\n') {
-                typingArea.innerHTML += '<br>';
-            } else {
-                typingArea.innerHTML += aboutText.charAt(i);
-            }
+            if(aboutText.charAt(i) === '\n') typingArea.innerHTML += '<br>';
+            else typingArea.innerHTML += aboutText.charAt(i);
             i++;
-        } else {
-            clearInterval(typingInterval);
-        }
+        } else clearInterval(typingInterval);
     }
 
     aboutBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        aboutModal.classList.add('active');
-        playSound('ui_click.mp3'); // Optional sound
-        
-        // Reset and Start Typing
-        typingArea.innerHTML = '';
-        i = 0;
-        clearInterval(typingInterval);
-        typingInterval = setInterval(typeWriter, 30); // Speed of typing
+        e.preventDefault(); aboutModal.classList.add('active'); playSound('ui_click.mp3');
+        typingArea.innerHTML = ''; i = 0; clearInterval(typingInterval);
+        typingInterval = setInterval(typeWriter, 30);
     });
 
-    closeAboutBtn.addEventListener('click', () => {
-        aboutModal.classList.remove('active');
-        clearInterval(typingInterval);
-    });
-
-    // Close on outside click
-    aboutModal.addEventListener('click', (e) => {
-        if (e.target === aboutModal) {
-            aboutModal.classList.remove('active');
-            clearInterval(typingInterval);
-        }
-    });
+    closeAboutBtn.addEventListener('click', () => { aboutModal.classList.remove('active'); clearInterval(typingInterval); });
+    aboutModal.addEventListener('click', (e) => { if (e.target === aboutModal) { aboutModal.classList.remove('active'); clearInterval(typingInterval); }});
 });
