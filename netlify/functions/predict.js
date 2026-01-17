@@ -2,7 +2,6 @@ const { Client } = require('pg');
 
 exports.handler = async (event, context) => {
     
-    // 1. Setup
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
@@ -10,7 +9,7 @@ exports.handler = async (event, context) => {
     };
 
     if (event.httpMethod !== 'POST') {
-        return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
+        return { statusCode: 405, headers, body: 'Method Not Allowed' };
     }
 
     const client = new Client({
@@ -20,28 +19,34 @@ exports.handler = async (event, context) => {
     });
 
     try {
-        const { rank, caste, course, quota } = JSON.parse(event.body);
+        const body = JSON.parse(event.body);
+        console.log("📥 INPUT RECEIVED:", body); // Log input
+
+        const { rank, caste, course, quota } = body;
         const userRank = parseInt(rank);
 
         await client.connect();
 
-        // --- SQL QUERY (SEEDHA DATABASE SE FILTRATION) ---
-        // Logic: Hum database ko bol rahe hain ki bhai wahi row dena jahan
-        // closing_rank user_rank se bada ya barabar ho.
-        // Jo fail hai wo database se bahar niklega hi nahi.
+        // --- SQL QUERY (CASE INSENSITIVE & SAFE) ---
+        // Hum 'ILIKE' use kar rahe hain taaki capital/small ka panga na ho.
+        // Rank filter yahan se hata diya hai taaki pehle check karein data aa raha hai ya nahi.
         const query = `
             SELECT inst_name, year, closing_rank, opening_rank, inst_type 
             FROM college_cutoffs 
             WHERE 
-                course_name = $1 
-                AND category = $2 
-                AND quota = $3 
-                AND closing_rank >= $4 
+                course_name ILIKE $1 
+                AND category ILIKE $2 
+                AND quota ILIKE $3
             ORDER BY closing_rank ASC
         `;
 
-        const values = [course, caste, quota, userRank];
+        // Input ke aage peeche '%' lagaya hai taaki milta-julta naam bhi pakad le
+        const values = [course.trim(), caste.trim(), quota.trim()];
+        
+        console.log("🔍 RUNNING QUERY WITH:", values);
         const result = await client.query(query, values);
+        
+        console.log(`✅ ROWS FOUND: ${result.rowCount}`);
 
         // --- DATA GROUPING ---
         const collegeMap = {};
@@ -51,43 +56,42 @@ exports.handler = async (event, context) => {
             if (!collegeMap[name]) {
                 collegeMap[name] = {
                     type: row.inst_type || 'Unknown',
-                    2024: null, 
+                    2024: null,
                     2025: null
                 };
             }
-            
-            // Jo data SQL ne diya hai use map me daalo
+            // Year Handle (String/Int dono chalega)
             if (row.year == 2024 || row.year == '2024') {
                 collegeMap[name][2024] = { open: row.opening_rank, close: row.closing_rank };
-            } 
-            else if (row.year == 2025 || row.year == '2025') {
+            } else if (row.year == 2025 || row.year == '2025') {
                 collegeMap[name][2025] = { open: row.opening_rank, close: row.closing_rank };
             }
         });
 
-        // --- FINAL CHECK (DONO SAAL HAI YA NAHI?) ---
+        // --- FILTERING ---
         const finalColleges = [];
 
         Object.keys(collegeMap).forEach(name => {
             const d = collegeMap[name];
 
-            // SIMPLE LOGIC:
-            // SQL ne wahi data diya jo PASS tha.
-            // Agar mere paas 2024 ka bhi data aa gaya aur 2025 ka bhi, 
-            // iska matlab user DONO saal PASS hai.
+            // Check if ANY data exists
             if (d[2024] && d[2025]) {
-                finalColleges.push({
-                    name: name,
-                    type: d.type,
-                    status: 'safe',
-                    details: { 
-                        y24: d[2024],
-                        y25: d[2025]
-                    }
-                });
+                const close24 = d[2024].close;
+                const close25 = d[2025].close;
+
+                // Tera STRICT Rule: Dono saal User Rank cutoff se kam hona chahiye
+                if (userRank <= close24 && userRank <= close25) {
+                    finalColleges.push({
+                        name: name,
+                        type: d.type,
+                        status: 'safe',
+                        details: { y24: d[2024], y25: d[2025] }
+                    });
+                }
             }
-            // Agar ek bhi gayab hai, matlab SQL ne use filter kar diya (Fail) -> Isliye Show mat karo.
         });
+
+        console.log(`🚀 FINAL MATCHED COLLEGES: ${finalColleges.length}`);
 
         await client.end();
 
@@ -98,11 +102,12 @@ exports.handler = async (event, context) => {
         };
 
     } catch (error) {
-        console.error('SERVER ERROR:', error);
+        console.error('❌ FATAL ERROR:', error);
         return {
-            statusCode: 500,
+            statusCode: 500, // Frontend ko batao 500 hai
             headers,
-            body: JSON.stringify({ success: false, error: error.message }),
+            // Error ka pura detail bhejo taaki alert me dikhe
+            body: JSON.stringify({ success: false, error: error.message, detail: error.stack }),
         };
     }
 };
