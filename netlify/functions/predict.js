@@ -2,95 +2,30 @@ const { Client } = require('pg');
 
 exports.handler = async (event, context) => {
     
-    // Headers
+    // 1. Headers Setup
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Content-Type': 'application/json'
     };
 
-    // 1. Check Method
+    // 2. Method Check
     if (event.httpMethod !== 'POST') {
-        return { statusCode: 405, headers, body: JSON.stringify({ error: 'Only POST allowed' }) };
-    }
-
-    // 2. Check Database URL
-    const dbUrl = process.env.NETLIFY_DATABASE_URL || process.env.DATABASE_URL;
-    if (!dbUrl) {
-        console.error("❌ ERROR: Database URL nahi mila! Env variable set kar.");
-        return { 
-            statusCode: 500, 
-            headers, 
-            body: JSON.stringify({ error: 'Database URL Missing in Netlify Settings' }) 
-        };
+        return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
     }
 
     const client = new Client({
-        connectionString: dbUrl,
+        connectionString: process.env.NETLIFY_DATABASE_URL || process.env.DATABASE_URL,
         ssl: { rejectUnauthorized: false },
-        connectionTimeoutMillis: 5000
+        connectionTimeoutMillis: 5000 // 5 sec se zyada wait mat karna
     });
 
     try {
-        console.log("🔌 Connecting to Database...");
+        const { rank, caste, course, quota } = JSON.parse(event.body);
+        const userRank = parseInt(rank);
+
+        console.log("Connecting to DB...");
         await client.connect();
-        console.log("✅ Connected!");
-
-        // 3. Check Input Parsing
-        console.log("📥 Parsing Input...");
-        const input = JSON.parse(event.body);
-        console.log("✅ Input Received:", input);
-
-        if (!input.rank) throw new Error("Rank missing hai input me");
-
-        // 4. Test Simple Query (Isse pata chalega table hai ya nahi)
-        console.log("🔍 Running Test Query...");
-        const testQuery = "SELECT count(*) FROM college_cutoffs";
-        const testResult = await client.query(testQuery);
-        console.log("✅ Table OK! Rows found:", testResult.rows[0].count);
-
-        // 5. Run Your ACTUAL Query (Safe Version)
-        // Hum simple values use karenge check karne ke liye
-        const userRank = parseInt(input.rank);
-        if (isNaN(userRank)) throw new Error("Rank number nahi hai");
-
-        const query = `
-            SELECT inst_name, year 
-            FROM college_cutoffs 
-            WHERE closing_rank >= $1 
-            LIMIT 5
-        `;
-        const realResult = await client.query(query, [userRank]);
-
-        await client.end();
-
-        return {
-            statusCode: 200,
-            headers,
-            body: JSON.stringify({ 
-                success: true, 
-                message: "System is Working!", 
-                sampleData: realResult.rows 
-            }),
-        };
-
-    } catch (error) {
-        console.error("❌ CRASH REPORT:", error);
-        
-        // Connection close karna zaroori hai agar crash ho jaye
-        try { await client.end(); } catch (e) {}
-
-        return {
-            statusCode: 500,
-            headers,
-            body: JSON.stringify({ 
-                success: false, 
-                error: error.message, 
-                stack: error.stack // Ye line tujhe batayegi galti kahan hai
-            })
-        };
-    }
-};        await client.connect();
         console.log("Connected! Querying...");
 
         // 3. Query (Sab kuch maango: Type, Open, Close)
@@ -162,13 +97,5 @@ exports.handler = async (event, context) => {
         // IMPORTANT: Connection hamesha close karo, warna Netlify 502 dega
         await client.end();
         console.log("DB Connection Closed");
-    }
-};            headers,
-            body: JSON.stringify({ success: true, data: finalColleges }),
-        };
-
-    } catch (error) {
-        console.error('SERVER ERROR:', error);
-        return { statusCode: 500, headers, body: JSON.stringify({ success: false, error: error.message }) };
     }
 };
