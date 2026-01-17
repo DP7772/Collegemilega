@@ -2,6 +2,7 @@ const { Client } = require('pg');
 
 exports.handler = async (event, context) => {
     
+    // 1. Headers Setup
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
@@ -22,7 +23,7 @@ exports.handler = async (event, context) => {
         let { rank, caste, course, quota } = JSON.parse(event.body);
         const userRank = parseInt(rank);
 
-        // Mapping (Agar user GEN dale to OPEN samjho)
+        // Mapping
         if (caste.toUpperCase() === 'GEN') caste = 'OPEN';
         if (caste.toUpperCase() === 'TFWS') caste = 'TFW';
         if (quota.toUpperCase() === 'JEE MAIN') quota = 'AI';
@@ -30,19 +31,29 @@ exports.handler = async (event, context) => {
 
         await client.connect();
 
+        // --- DIRECT SQL LOGIC (Tera Wala Approach) ---
+        // 1. Hum DB ko bol rahe hain: "Sirf PASS wala data bhejo" (closing_rank >= userRank)
+        // 2. Hum CAST use kar rahe hain taaki .00 hat jaye (Clean Number)
         const query = `
-            SELECT inst_name, year, closing_rank, opening_rank, inst_type 
+            SELECT 
+                inst_name, 
+                year, 
+                CAST(closing_rank AS INTEGER) as close_r, 
+                CAST(opening_rank AS INTEGER) as open_r, 
+                inst_type 
             FROM college_cutoffs 
             WHERE 
-                course_name ILIKE $1 
-                AND category ILIKE $2 
-                AND (quota ILIKE $3 OR quota ILIKE 'All India' OR quota ILIKE 'Home State')
+                course_name = $1 
+                AND category = $2 
+                AND quota = $3 
+                AND closing_rank >= $4 
             ORDER BY closing_rank ASC
         `;
 
-        const values = [course.trim(), caste.trim(), quota.trim()];
+        const values = [course, caste, quota, userRank];
         const result = await client.query(query, values);
 
+        // --- DATA GROUPING ---
         const collegeMap = {};
 
         result.rows.forEach(row => {
@@ -50,47 +61,42 @@ exports.handler = async (event, context) => {
             if (!collegeMap[name]) {
                 collegeMap[name] = {
                     type: row.inst_type || 'Unknown',
-                    2024: null,
-                    2025: null
+                    2024: null, 
+                    2025: null 
                 };
             }
             
-            // Year Check
+            // Jo row aayi hai, wo CONFIRMED PASS wali hi hai
+            const openVal = row.open_r;
+            const closeVal = row.close_r;
+
             if (row.year == 2024 || row.year == '2024') {
-                collegeMap[name][2024] = { open: row.opening_rank, close: row.closing_rank };
+                collegeMap[name][2024] = { open: openVal, close: closeVal };
             } else if (row.year == 2025 || row.year == '2025') {
-                collegeMap[name][2025] = { open: row.opening_rank, close: row.closing_rank };
+                collegeMap[name][2025] = { open: openVal, close: closeVal };
             }
         });
 
+        // --- FINAL CHECK (Strict: Dono saal pass hone chahiye) ---
         const finalColleges = [];
 
         Object.keys(collegeMap).forEach(name => {
             const d = collegeMap[name];
 
-            // 1. Check Data Exists
+            // LOGIC:
+            // Agar SQL ne 2024 ka data nahi bheja, iska matlab tu 2024 mein fail tha.
+            // Hum sirf tabhi dikhayenge jab DONO saal ka data SQL se wapas aaya ho.
             if (d[2024] && d[2025]) {
                 
-                // DATA CLEANING: .00 ya String ko Number banao
-                // Agar DB me '14620.00' hai to ye '14620' ban jayega
-                const close24 = parseInt(d[2024].close);
-                const close25 = parseInt(d[2025].close);
-                const open24 = d[2024].open ? parseInt(d[2024].open) : 'N/A';
-                const open25 = d[2025].open ? parseInt(d[2025].open) : 'N/A';
-
-                // 2. Pass Check (Comparison)
-                if (userRank <= close24 && userRank <= close25) {
-                    finalColleges.push({
-                        name: name,
-                        type: d.type,
-                        status: 'safe',
-                        details: { 
-                            // Yahan hum CLEAN number bhej rahe hain
-                            y24: { open: open24, close: close24 }, 
-                            y25: { open: open25, close: close25 }
-                        }
-                    });
-                }
+                finalColleges.push({
+                    name: name,
+                    type: d.type,
+                    status: 'safe',
+                    details: { 
+                        y24: d[2024], 
+                        y25: d[2025] 
+                    }
+                });
             }
         });
 
