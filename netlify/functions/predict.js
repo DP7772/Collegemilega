@@ -17,34 +17,34 @@ exports.handler = async (event, context) => {
     const client = new Client({
         connectionString: process.env.NETLIFY_DATABASE_URL || process.env.DATABASE_URL,
         ssl: { rejectUnauthorized: false },
-        connectionTimeoutMillis: 5000
+        connectionTimeoutMillis: 5000 // 5 sec se zyada wait mat karna
     });
 
     try {
-        const body = JSON.parse(event.body);
-        const { rank, caste, course, quota } = body;
+        const { rank, caste, course, quota } = JSON.parse(event.body);
         const userRank = parseInt(rank);
 
+        console.log("Connecting to DB...");
         await client.connect();
+        console.log("Connected! Querying...");
 
-        // --- STEP 1: SQL QUERY (SARA DATA LE AAO) ---
-        // Hum yahan Rank filter nahi laga rahe. Kyun?
-        // Kyunki agar hum SQL me filter lagayenge to 'Fail' wale saal ka data aayega hi nahi
-        // aur hum check nahi kar payenge ki dono saal pass hai ya nahi.
+        // 3. Query (Sab kuch maango: Type, Open, Close)
         const query = `
             SELECT inst_name, year, closing_rank, opening_rank, inst_type 
             FROM college_cutoffs 
             WHERE 
-                course_name ILIKE $1 
-                AND category ILIKE $2 
-                AND quota ILIKE $3
+                course_name = $1 
+                AND category = $2 
+                AND quota = $3 
+                AND closing_rank >= $4 
             ORDER BY closing_rank ASC
         `;
 
-        const values = [course.trim(), caste.trim(), quota.trim()];
+        const values = [course, caste, quota, userRank];
         const result = await client.query(query, values);
+        console.log(`Data Found: ${result.rowCount} rows`);
 
-        // --- STEP 2: DATA GROUPING ---
+        // 4. Data Grouping
         const collegeMap = {};
 
         result.rows.forEach(row => {
@@ -52,49 +52,33 @@ exports.handler = async (event, context) => {
             if (!collegeMap[name]) {
                 collegeMap[name] = {
                     type: row.inst_type || 'Unknown',
-                    2024: null, // Default null
-                    2025: null
+                    2024: { close: 'N/A', open: 'N/A' },
+                    2025: { close: 'N/A', open: 'N/A' }
                 };
             }
-            // Data bharna
-            if (row.year == 2024 || row.year == '2024') {
-                collegeMap[name][2024] = { open: row.opening_rank, close: row.closing_rank };
-            } else if (row.year == 2025 || row.year == '2025') {
-                collegeMap[name][2025] = { open: row.opening_rank, close: row.closing_rank };
+            
+            // Year check (Flexible string/int match)
+            const y = (row.year == 2024 || row.year == '2024') ? 2024 : 
+                      (row.year == 2025 || row.year == '2025') ? 2025 : null;
+
+            if(y) {
+                collegeMap[name][y] = {
+                    close: row.closing_rank,
+                    open: row.opening_rank
+                };
             }
         });
 
-        // --- STEP 3: STRICT FILTERING (TERA MAIN LOGIC) ---
-        const finalColleges = [];
-
-        Object.keys(collegeMap).forEach(name => {
+        // 5. Final List
+        const finalColleges = Object.keys(collegeMap).map(name => {
             const d = collegeMap[name];
-
-            // RULE 1: Kya dono saal ka data Database me hai?
-            if (d[2024] && d[2025]) {
-                
-                const close24 = parseInt(d[2024].close);
-                const close25 = parseInt(d[2025].close);
-
-                // RULE 2: Kya User Rank dono saal ke Cutoff ke andar hai?
-                // Example: User 13000 <= Cutoff 13500 (PASS)
-                if (userRank <= close24 && userRank <= close25) {
-                    
-                    // Agar sab Pass hai, to list me add karo
-                    finalColleges.push({
-                        name: name,
-                        type: d.type,
-                        status: 'safe',
-                        details: { 
-                            y24: d[2024],
-                            y25: d[2025]
-                        }
-                    });
-                }
-            }
+            return {
+                name: name,
+                type: d.type,
+                status: 'safe',
+                details: { y24: d[2024], y25: d[2025] }
+            };
         });
-
-        await client.end();
 
         return {
             statusCode: 200,
@@ -105,9 +89,13 @@ exports.handler = async (event, context) => {
     } catch (error) {
         console.error('SERVER ERROR:', error);
         return {
-            statusCode: 500,
+            statusCode: 500, // 502 nahi, proper 500 error return karo info ke sath
             headers,
             body: JSON.stringify({ success: false, error: error.message }),
         };
+    } finally {
+        // IMPORTANT: Connection hamesha close karo, warna Netlify 502 dega
+        await client.end();
+        console.log("DB Connection Closed");
     }
 };
