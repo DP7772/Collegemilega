@@ -2,112 +2,95 @@ const { Client } = require('pg');
 
 exports.handler = async (event, context) => {
     
-    // Headers setup
+    // Headers
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Content-Type': 'application/json'
     };
 
+    // 1. Check Method
     if (event.httpMethod !== 'POST') {
-        return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
+        return { statusCode: 405, headers, body: JSON.stringify({ error: 'Only POST allowed' }) };
+    }
+
+    // 2. Check Database URL
+    const dbUrl = process.env.NETLIFY_DATABASE_URL || process.env.DATABASE_URL;
+    if (!dbUrl) {
+        console.error("❌ ERROR: Database URL nahi mila! Env variable set kar.");
+        return { 
+            statusCode: 500, 
+            headers, 
+            body: JSON.stringify({ error: 'Database URL Missing in Netlify Settings' }) 
+        };
     }
 
     const client = new Client({
-        connectionString: process.env.NETLIFY_DATABASE_URL || process.env.DATABASE_URL,
+        connectionString: dbUrl,
         ssl: { rejectUnauthorized: false },
         connectionTimeoutMillis: 5000
     });
 
     try {
-        let { rank, caste, course, quota } = JSON.parse(event.body);
-        const userRank = parseInt(rank);
-
-        console.log(`📥 Searching Guaranteed Seats (Both Years): Rank=${userRank}`);
-
-        // --- MAPPINGS ---
-        let casteFilter = [caste]; 
-        if (caste.toUpperCase().includes('GEN') || caste.toUpperCase() == 'OPEN') casteFilter = ['OPEN', 'GEN', 'General', 'OP'];
-        else if (caste.toUpperCase().includes('TFW')) casteFilter = ['TFW', 'TFWS', 'TFWs'];
-        
-        let quotaFilter = [quota];
-        if (quota.toUpperCase().includes('GUJCET')) quotaFilter = ['HS', 'Home State', 'State', 'SQ', 'GUJCET']; 
-        else if (quota.toUpperCase().includes('JEE')) quotaFilter = ['AI', 'All India', 'JEE'];
-
+        console.log("🔌 Connecting to Database...");
         await client.connect();
+        console.log("✅ Connected!");
 
-        // --- STRICT LOGIC: FILTER -> GROUP -> BOTH CHECK ---
+        // 3. Check Input Parsing
+        console.log("📥 Parsing Input...");
+        const input = JSON.parse(event.body);
+        console.log("✅ Input Received:", input);
+
+        if (!input.rank) throw new Error("Rank missing hai input me");
+
+        // 4. Test Simple Query (Isse pata chalega table hai ya nahi)
+        console.log("🔍 Running Test Query...");
+        const testQuery = "SELECT count(*) FROM college_cutoffs";
+        const testResult = await client.query(testQuery);
+        console.log("✅ Table OK! Rows found:", testResult.rows[0].count);
+
+        // 5. Run Your ACTUAL Query (Safe Version)
+        // Hum simple values use karenge check karne ke liye
+        const userRank = parseInt(input.rank);
+        if (isNaN(userRank)) throw new Error("Rank number nahi hai");
+
         const query = `
-            WITH Qualified_Data AS (
-                -- STEP 1: Pehle RANK CONDITION se data filter karo
-                -- Jo fail hai wo yahi bahar nikal jayega.
-                SELECT * FROM college_cutoffs 
-                WHERE 
-                    course_name ILIKE $1 
-                    AND (category = ANY($2::text[])) 
-                    AND (quota = ANY($3::text[]))    
-                    AND closing_rank >= $4  -- <--- User Pass hona chahiye
-            )
-            -- STEP 2: Ab bache hue result par GROUP BY lagao
-            SELECT 
-                inst_name,
-                inst_type,
-                MAX(CASE WHEN year = 2024 THEN opening_rank END) as open_24,
-                MAX(CASE WHEN year = 2024 THEN closing_rank END) as close_24,
-                MAX(CASE WHEN year = 2025 THEN opening_rank END) as open_25,
-                MAX(CASE WHEN year = 2025 THEN closing_rank END) as close_25
-            FROM Qualified_Data
-            GROUP BY inst_name, inst_type
-            
-            -- STEP 3: STRICT CHECK (Jo dono yr ko pass kar jaye uspe hi, jo sirf ek me ho wo nahi)
-            HAVING 
-                MAX(CASE WHEN year = 2024 THEN 1 ELSE 0 END) = 1 
-                AND 
-                MAX(CASE WHEN year = 2025 THEN 1 ELSE 0 END) = 1;
+            SELECT inst_name, year 
+            FROM college_cutoffs 
+            WHERE closing_rank >= $1 
+            LIMIT 5
         `;
-
-        const values = [`%${course.trim()}%`, casteFilter, quotaFilter, userRank];
-        const result = await client.query(query, values);
-
-        console.log(`✅ Final Guaranteed Colleges: ${result.rowCount}`);
-
-        const finalColleges = result.rows.map(row => {
-            return {
-                name: row.inst_name,
-                type: row.inst_type || 'Unknown',
-                status: 'Confirmed 2026',
-                details: { 
-                    y24: { open: row.open_24, close: row.close_24 },
-                    y25: { open: row.open_25, close: row.close_25 }
-                }
-            };
-        });
+        const realResult = await client.query(query, [userRank]);
 
         await client.end();
-        return { statusCode: 200, headers, body: JSON.stringify({ success: true, data: finalColleges }) };
+
+        return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({ 
+                success: true, 
+                message: "System is Working!", 
+                sampleData: realResult.rows 
+            }),
+        };
 
     } catch (error) {
-        return { statusCode: 500, headers, body: JSON.stringify({ success: false, error: error.message }) };
+        console.error("❌ CRASH REPORT:", error);
+        
+        // Connection close karna zaroori hai agar crash ho jaye
+        try { await client.end(); } catch (e) {}
+
+        return {
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({ 
+                success: false, 
+                error: error.message, 
+                stack: error.stack // Ye line tujhe batayegi galti kahan hai
+            })
+        };
     }
-};    };
-
-    // 2. Method Check
-    if (event.httpMethod !== 'POST') {
-        return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
-    }
-
-    const client = new Client({
-        connectionString: process.env.NETLIFY_DATABASE_URL || process.env.DATABASE_URL,
-        ssl: { rejectUnauthorized: false },
-        connectionTimeoutMillis: 5000 // 5 sec se zyada wait mat karna
-    });
-
-    try {
-        const { rank, caste, course, quota } = JSON.parse(event.body);
-        const userRank = parseInt(rank);
-
-        console.log("Connecting to DB...");
-        await client.connect();
+};        await client.connect();
         console.log("Connected! Querying...");
 
         // 3. Query (Sab kuch maango: Type, Open, Close)
