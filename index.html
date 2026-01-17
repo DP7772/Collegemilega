@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CollegeMilega - The Final Saga</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="cyber-nav">
+    <div class="nav-brand">SYSTEM_V.1.0</div>
+    <ul class="nav-links">
+        <li><a href="#" class="nav-item active">HOME</a></li>
+        <li><a href="#" class="nav-item" id="open-about">MISSION LOG</a></li> <li><a href="#" class="nav-item">CONTACT</a></li>
+    </ul>
+</nav>
+
+<div id="about-modal" class="modal-overlay">
+    <div class="modal-terminal">
+        <div class="terminal-header">
+            <span>> SYSTEM_INFO.LOG</span>
+            <button class="close-btn" id="close-about">X</button>
+        </div>
+        <div class="terminal-body">
+            <p id="typing-area"></p> </div>
+        <div class="scan-line"></div>
+    </div>
+</div>
+    <div id="start-screen">
+        <button id="start-btn">INITIALIZE SYSTEM</button>
+        <p>Bhavishya Tumhara Intezaar Kar Raha Hai..</p>
+    </div>
+
+    <canvas id="space"></canvas>
+
+    <div class="sword-container" id="sword">
+        <div class="blade">
+            <div class="core-energy"></div>
+        </div>
+        <div class="guard">
+            <div class="ak-logo">AK</div>
+        </div>
+        <div class="handle">
+            <div class="grip"></div>
+            <div class="grip"></div>
+            <div class="grip"></div>
+        </div>
+    </div>
+
+    <div class="magma-core" id="magma"></div>
+
+    <div class="title-text" id="main-text">
+        COLLEGEMILEGA
+        <div class="subtitle">Anant Sambhavnao ke Dwar</div>
+    </div>
+
+    <div class="hud-container" id="hud">
+        <div class="hud-grid">
+            <div class="hud-box">
+                <label>RANK</label>
+                <input type="number" id="input-rank" placeholder="00000">
+            </div>
+            
+            <div class="hud-box">
+                <label>CASTE</label>
+                <select id="input-caste">
+                    <option value="">Select</option>
+                    <option value="GEN">GEN</option>
+                    <option value="TFWs">TFWs</option>
+                    <option value="SC">SC</option>
+                    <option value="ST">ST</option>
+                    <option value="SEBC">SEBC</option>
+                    <option value="EWS">EWS</option>
+                    <option value="ESM">ESM</option>
+                </select>
+            </div>
+
+            <div class="hud-box">
+                <label>COURSE</label>
+                <select id="input-course">
+                            <option value="">Select Course</option>
+                            <option value="AERO SPACE ENGINEERING">AERO SPACE ENGINEERING</option>
+                            <option value="AERO SPACE ENGINEERING-TFWS">AERO SPACE ENGINEERING-TFWS</option>
+                            <option value="AERONAUTICAL ENGINEERING">AERONAUTICAL ENGINEERING</option>
+                            <option value="AERONAUTICAL ENGINEERING - TFWS">AERONAUTICAL ENGINEERING - TFWS</option>
+                            <option value="AGRICULTURAL ENGINEERING">AGRICULTURAL ENGINEERING</option>
+                            <option value="AGRICULTURAL ENGINEERING - TFWS">AGRICULTURAL ENGINEERING - TFWS</option>
+                            <option value="AGRICULTURAL TECHNOLOGY">AGRICULTURAL TECHNOLOGY</option>
+                            <option value="AGRICULTURAL TECHNOLOGY-TFWS">AGRICULTURAL TECHNOLOGY-TFWS</option>
+                            <option value="ARTIFICIAL INTELLIGENCE">ARTIFICIAL INTELLIGENCE</option>
+                            <option value="ARTIFICIAL INTELLIGENCE AND DATA SCIENCE">ARTIFICIAL INTELLIGENCE AND DATA SCIENCE</option>
+                            <option value="ARTIFICIAL INTELLIGENCE AND DATA SCIENCE - TFWS">ARTIFICIAL INTELLIGENCE AND DATA SCIENCE - TFWS</option>
+                            <option value="ARTIFICIAL INTELLIGENCE(AI) AND MACHINE LEARNING">ARTIFICIAL INTELLIGENCE(AI) AND MACHINE LEARNING</option>
+                            <option value="ARTIFICIAL INTELLIGENCE(AI) AND MACHINE LEARNING - TFW">ARTIFICIAL INTELLIGENCE(AI) AND MACHINE LEARNING - TFW</option>
+                            <option value="AUTOMOBILE ENGINEERING">AUTOMOBILE ENGINEERING</option>
+                            <option value="AUTOMOBILE ENGINEERING - TFWS">AUTOMOBILE ENGINEERING - TFWS</option>
+                            <option value="BACHELOR OF TECHNOLOGY (HONS) IN CIVIL ENGINEERING (BCE)">BACHELOR OF TECHNOLOGY (HONS) IN CIVIL ENGINEERING (BCE)</option>
+                            <option value="BIOINFORMATICS">BIOINFORMATICS</option>
+                            <option value="BIOMEDICAL ENGINEERING">BIOMEDICAL ENGINEERING</option>
+                            <option value="BIOMEDICAL ENGINEERING - TFWS">BIOMEDICAL ENGINEERING - TFWS</option>
+                            <option value="BIOTECHNOLOGY">BIOTECHNOLOGY</option>
+                            <option value="BIOTECHNOLOGY - TFWS">BIOTECHNOLOGY - TFWS</option>
+                            <option value="CHEMICAL & BIOCHEMICAL ENGINEERING">CHEMICAL & BIOCHEMICAL ENGINEERING</option>
+                            <option value="CHEMICAL AND ENVIRONMENTAL ENGINEERING">CHEMICAL AND ENVIRONMENTAL ENGINEERING</option>
+                            <option value="CHEMICAL ENGINEERING">CHEMICAL ENGINEERING</option>
+                            <option value="CHEMICAL ENGINEERING - TFWS">CHEMICAL ENGINEERING - TFWS</option>
+                            <option value="CHEMICAL ENGINEERING (GREEN TECHNOLOGY AND SUSTAINABILITY ENGINEERING)">CHEMICAL ENGINEERING (GREEN TECH & SUSTAINABILITY)</option>
+                            <option value="CHEMICAL TECHNOLOGY">CHEMICAL TECHNOLOGY</option>
+                            <option value="CIVIL ENGINEERING">CIVIL ENGINEERING</option>
+                            <option value="CIVIL ENGINEERING - TFWS">CIVIL ENGINEERING - TFWS</option>
+                            <option value="CIVIL IRRIGATION WATER MANAGEMENT">CIVIL IRRIGATION WATER MANAGEMENT</option>
+                            <option value="CLIMATE CHANGE">CLIMATE CHANGE</option>
+                            <option value="CLOUD TECH &INFORMATION SECURITY">CLOUD TECH & INFORMATION SECURITY</option>
+                            <option value="COMPUTER ENGINEERING">COMPUTER ENGINEERING</option>
+                            <option value="COMPUTER ENGINEERING - TFWS">COMPUTER ENGINEERING - TFWS</option>
+                            <option value="COMPUTER ENGINEERING & APPLICATION">COMPUTER ENGINEERING & APPLICATION</option>
+                            <option value="COMPUTER ENGINEERING & APPLICATION - TFWS">COMPUTER ENGINEERING & APPLICATION - TFWS</option>
+                            <option value="COMPUTER ENGINEERING (ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING)">COMPUTER ENGINEERING (AI & ML)</option>
+                            <option value="COMPUTER ENGINEERING (ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING) - TFWS">COMPUTER ENGINEERING (AI & ML) - TFWS</option>
+                            <option value="COMPUTER ENGINEERING (ARTIFICIAL INTELLIGENCE)">COMPUTER ENGINEERING (AI)</option>
+                            <option value="COMPUTER ENGINEERING (ARTIFICIAL INTELLIGENCE) - TFWS">COMPUTER ENGINEERING (AI) - TFWS</option>
+                            <option value="COMPUTER ENGINEERING (CLOUD TECH. & INFO.SEC.)">COMPUTER ENGINEERING (CLOUD TECH & INFO.SEC)</option>
+                            <option value="COMPUTER ENGINEERING (DATA SCIENCE)">COMPUTER ENGINEERING (DATA SCIENCE)</option>
+                            <option value="COMPUTER ENGINEERING (SOFTWARE ENGINEERING)">COMPUTER ENGINEERING (SOFTWARE ENGINEERING)</option>
+                            <option value="COMPUTER ENGINEERING-GUJARATI">COMPUTER ENGINEERING-GUJARATI</option>
+                            <option value="COMPUTER SCIENCE & BIOSCIENCES">COMPUTER SCIENCE & BIOSCIENCES</option>
+                            <option value="COMPUTER SCIENCE & BIOSCIENCES - TFW">COMPUTER SCIENCE & BIOSCIENCES - TFW</option>
+                            <option value="COMPUTER SCIENCE & BUSINESS SYSTEMS">COMPUTER SCIENCE & BUSINESS SYSTEMS</option>
+                            <option value="COMPUTER SCIENCE & BUSINESS SYSTEMS - TFW">COMPUTER SCIENCE & BUSINESS SYSTEMS - TFW</option>
+                            <option value="COMPUTER SCIENCE & DESIGN">COMPUTER SCIENCE & DESIGN</option>
+                            <option value="COMPUTER SCIENCE & DESIGN - TFW">COMPUTER SCIENCE & DESIGN - TFW</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING">COMPUTER SCIENCE & ENGINEERING</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING - M.TECH INTEGRATED">COMPUTER SCIENCE & ENGINEERING - M.TECH INTEGRATED</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING - M.TECH INTEGRATED - TFWS">COMPUTER SCIENCE & ENGINEERING - M.TECH INTEGRATED - TFWS</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING - TFWS">COMPUTER SCIENCE & ENGINEERING - TFWS</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING (ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING)">CSE (AI & ML)</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING (ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING) - TFWS">CSE (AI & ML) - TFWS</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING (ARTIFICIAL INTELLIGENCE)">CSE (ARTIFICIAL INTELLIGENCE)</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING (ARTIFICIAL INTELLIGENCE) - TFWS">CSE (ARTIFICIAL INTELLIGENCE) - TFWS</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING (BIG DATA ANALYTICS)">CSE (BIG DATA ANALYTICS)</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING (BIG DATA ANALYTICS) - TFWS">CSE (BIG DATA ANALYTICS) - TFWS</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING (BLOCK CHAIN TECHNOLOGY)">CSE (BLOCK CHAIN TECHNOLOGY)</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING (CLOUD COMPUTING)">CSE (CLOUD COMPUTING)</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING (CLOUD COMPUTING) - TFW">CSE (CLOUD COMPUTING) - TFW</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING (CYBER SECURITY)">CSE (CYBER SECURITY)</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING (CYBER SECURITY) - TFWS">CSE (CYBER SECURITY) - TFWS</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING (DATA SCIENCE)">CSE (DATA SCIENCE)</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING (DATA SCIENCE) - TFW">CSE (DATA SCIENCE) - TFW</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING (IOT & CYBER SECURITY INCLUDING BLOCK CHAIN)">CSE (IOT & CYBER SECURITY)</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING (INTERNET OF THINGS)">CSE (INTERNET OF THINGS)</option>
+                            <option value="COMPUTER SCIENCE & ENGINEERING (INTERNET OF THINGS) - TFW">CSE (INTERNET OF THINGS) - TFW</option>
+                            <option value="COMPUTER SCIENCE & INFORMATION TECHNOLOGY">COMPUTER SCIENCE & INFORMATION TECHNOLOGY</option>
+                            <option value="COMPUTER SCIENCE & INFORMATION TECHNOLOGY - TFWS">COMPUTER SCIENCE & INFORMATION TECHNOLOGY - TFWS</option>
+                            <option value="COMPUTER SCIENCE & TECHNOLOGY">COMPUTER SCIENCE & TECHNOLOGY</option>
+                            <option value="COMPUTER SCIENCE & TECHNOLOGY - TFWS">COMPUTER SCIENCE & TECHNOLOGY - TFWS</option>
+                            <option value="CYBER SECURITY">CYBER SECURITY</option>
+                            <option value="DAIRY TECHNOLOGY">DAIRY TECHNOLOGY</option>
+                            <option value="DAIRY TECHNOLOGY - TFWS">DAIRY TECHNOLOGY - TFWS</option>
+                            <option value="ELECTRICAL AND ELECTRONICS ENGINEERING">ELECTRICAL AND ELECTRONICS ENGINEERING</option>
+                            <option value="ELECTRICAL AND ELECTRONICS ENGINEERING - TFWS">ELECTRICAL AND ELECTRONICS ENGINEERING - TFWS</option>
+                            <option value="ELECTRICAL ENGINEERING">ELECTRICAL ENGINEERING</option>
+                            <option value="ELECTRICAL ENGINEERING - TFWS">ELECTRICAL ENGINEERING - TFWS</option>
+                            <option value="ELECTRONICS & COMMUNICATION (COMMUNICATION SYSTEM ENGG.)">ELECTRONICS & COMMUNICATION (COMMUNICATION SYSTEM)</option>
+                            <option value="ELECTRONICS & COMMUNICATION ENGINEERING">ELECTRONICS & COMMUNICATION ENGINEERING</option>
+                            <option value="ELECTRONICS & COMMUNICATION ENGINEERING - TFWS">ELECTRONICS & COMMUNICATION ENGINEERING - TFWS</option>
+                            <option value="ELECTRONICS & INSTRUMENTATION ENGINEERING">ELECTRONICS & INSTRUMENTATION ENGINEERING</option>
+                            <option value="ELECTRONICS & INSTRUMENTATION ENGINEERING - TFW">ELECTRONICS & INSTRUMENTATION ENGINEERING - TFW</option>
+                            <option value="ELECTRONICS ENGINEERING">ELECTRONICS ENGINEERING</option>
+                            <option value="ELECTRONICS ENGINEERING (VLSI DESIGN AND TECHNOLOGY)">ELECTRONICS ENGINEERING (VLSI DESIGN)</option>
+                            <option value="ELECTRONICS ENGINEERING (VLSI DESIGN AND TECHNOLOGY) - TFW">ELECTRONICS ENGINEERING (VLSI DESIGN) - TFW</option>
+                            <option value="ELECTRONICS ENGINEERING-TFWS">ELECTRONICS ENGINEERING-TFWS</option>
+                            <option value="ENVIRONMENT ENGINEERING">ENVIRONMENT ENGINEERING</option>
+                            <option value="ENVIRONMENTAL ENGINEERING">ENVIRONMENTAL ENGINEERING</option>
+                            <option value="ENVIRONMENTAL ENGINEERING - TFWS">ENVIRONMENTAL ENGINEERING - TFWS</option>
+                            <option value="ENVIRONMENTAL SCIENCE & TECHNOLOGY">ENVIRONMENTAL SCIENCE & TECHNOLOGY</option>
+                            <option value="ENVIRONMENTAL SCIENCE & TECHNOLOGY - TFWS">ENVIRONMENTAL SCIENCE & TECHNOLOGY - TFWS</option>
+                            <option value="FIRE AND ENVIRONMENT, HEALTH, SAFETY ENGINEERING">FIRE AND ENVIRONMENT, HEALTH, SAFETY ENGINEERING</option>
+                            <option value="FOOD ENGINEERING AND TECHNOLOGY">FOOD ENGINEERING AND TECHNOLOGY</option>
+                            <option value="FOOD PROCESSING TECHNOLOGY">FOOD PROCESSING TECHNOLOGY</option>
+                            <option value="FOOD PROCESSING TECHNOLOGY - TFWS">FOOD PROCESSING TECHNOLOGY - TFWS</option>
+                            <option value="FOOD TECHNOLOGY">FOOD TECHNOLOGY</option>
+                            <option value="FOOD TECHNOLOGY -TFW">FOOD TECHNOLOGY -TFW</option>
+                            <option value="HONS. IN ICT WITH MINOR IN COMPUTATIONAL SCIENCE (CS)">HONS. IN ICT WITH MINOR IN COMPUTATIONAL SCIENCE</option>
+                            <option value="HONS. IN ICT WITH MINOR IN COMPUTATIONAL SCIENCE (CS) - TFWS">HONS. IN ICT WITH MINOR IN COMPUTATIONAL SCIENCE - TFWS</option>
+                            <option value="INFORMATION & COMMUNICATION TECHNOLOGY">INFORMATION & COMMUNICATION TECHNOLOGY</option>
+                            <option value="INFORMATION & COMMUNICATION TECHNOLOGY - TFWS">INFORMATION & COMMUNICATION TECHNOLOGY - TFWS</option>
+                            <option value="INFORMATION TECHNOLOGY">INFORMATION TECHNOLOGY</option>
+                            <option value="INFORMATION TECHNOLOGY - TFWS">INFORMATION TECHNOLOGY - TFWS</option>
+                            <option value="INFORMATION TECHNOLOGY & ENGINEERING">INFORMATION TECHNOLOGY & ENGINEERING</option>
+                            <option value="INFORMATION TECHNOLOGY & ENGINEERING - TFW">INFORMATION TECHNOLOGY & ENGINEERING - TFW</option>
+                            <option value="INSTRUMENTATION & CONTROL ENGINEERING">INSTRUMENTATION & CONTROL ENGINEERING</option>
+                            <option value="INSTRUMENTATION & CONTROL ENGINEERING - TFWS">INSTRUMENTATION & CONTROL ENGINEERING - TFWS</option>
+                            <option value="MANUFACTURING ENGINEERING">MANUFACTURING ENGINEERING</option>
+                            <option value="MARINE ENGINEERING">MARINE ENGINEERING</option>
+                            <option value="MATHEMATICS AND COMPUTING">MATHEMATICS AND COMPUTING</option>
+                            <option value="MATHEMATICS AND COMPUTING - TFWS">MATHEMATICS AND COMPUTING - TFWS</option>
+                            <option value="MECHANICAL ENGINEERING">MECHANICAL ENGINEERING</option>
+                            <option value="MECHANICAL ENGINEERING - TFWS">MECHANICAL ENGINEERING - TFWS</option>
+                            <option value="MECHANICAL ENGINEERING-GUJARATI">MECHANICAL ENGINEERING-GUJARATI</option>
+                            <option value="MECHATRONICS ENGINEERING">MECHATRONICS ENGINEERING</option>
+                            <option value="METALLURGICAL AND MATERIALS ENGINEERING">METALLURGICAL AND MATERIALS ENGINEERING</option>
+                            <option value="METALLURGICAL AND MATERIALS ENGINEERING - TFWS">METALLURGICAL AND MATERIALS ENGINEERING - TFWS</option>
+                            <option value="METALLURGICAL ENGINEERING">METALLURGICAL ENGINEERING</option>
+                            <option value="METALLURGY">METALLURGY</option>
+                            <option value="MINING ENGINEERING">MINING ENGINEERING</option>
+                            <option value="NANO TECHNOLOGY">NANO TECHNOLOGY</option>
+                            <option value="PETROCHEMICAL ENGINEERING">PETROCHEMICAL ENGINEERING</option>
+                            <option value="PETROLEUM ENGINEERING">PETROLEUM ENGINEERING</option>
+                            <option value="PETROLEUM ENGINEERING - TFWS">PETROLEUM ENGINEERING - TFWS</option>
+                            <option value="PHARMACEUTICAL ENGINEERING">PHARMACEUTICAL ENGINEERING</option>
+                            <option value="PLASTIC AND POLYMER ENGINEERING">PLASTIC AND POLYMER ENGINEERING</option>
+                            <option value="PLASTIC AND POLYMER ENGINEERING- TFWS">PLASTIC AND POLYMER ENGINEERING- TFWS</option>
+                            <option value="PLASTIC ENGINEERING">PLASTIC ENGINEERING</option>
+                            <option value="PLASTIC TECHNOLOGY">PLASTIC TECHNOLOGY</option>
+                            <option value="POWER ELECTRONICS">POWER ELECTRONICS</option>
+                            <option value="POWER ELECTRONICS - TFWS">POWER ELECTRONICS - TFWS</option>
+                            <option value="PRODUCTION ENGINEERING">PRODUCTION ENGINEERING</option>
+                            <option value="ROBOTICS & ARTIFICIAL INTELLIGENCE">ROBOTICS & ARTIFICIAL INTELLIGENCE</option>
+                            <option value="ROBOTICS & ARTIFICIAL INTELLIGENCE - TFW">ROBOTICS & ARTIFICIAL INTELLIGENCE - TFW</option>
+                            <option value="ROBOTICS AND AUTOMATION">ROBOTICS AND AUTOMATION</option>
+                            <option value="ROBOTICS AND AUTOMATION - TFWS">ROBOTICS AND AUTOMATION - TFWS</option>
+                            <option value="RUBBER TECHNOLOGY">RUBBER TECHNOLOGY</option>
+                            <option value="TEXTILE ENGINEERING">TEXTILE ENGINEERING</option>
+                            <option value="TEXTILE PROCESSING">TEXTILE PROCESSING</option>
+                            <option value="TEXTILE TECHNOLOGY">TEXTILE TECHNOLOGY</option>
+                        </select>
+            </div>
+
+            <div class="hud-box">
+                <label>QUOTA</label>
+                <select id="input-quota">
+                    <option value="">Select</option>
+                    <option value="GUJCET">GUJCET</option>
+                    <option value="JEE">JEE MAIN</option>
+                </select>
+            </div>
+        </div>
+
+        <button id="launch-btn">CHECK FUTURE</button>
+    </div>
+
+    <div id="space-view">
+        
+        <div class="honeycomb-grid" id="honeycomb"></div>
+        
+        <div class="space-controls">
+            <button id="prev-btn" class="nav-btn" disabled>&lt; PREV GALAXY</button>
+            <button id="back-btn" class="nav-btn red">RETURN TO EARTH</button>
+            <button id="next-btn" class="nav-btn">NEXT GALAXY &gt;</button>
+        </div>
+
+        <div id="college-details-panel">
+            <h2 id="col-name">College Name</h2>
+            <p>Status: Confirmed Admission</p>
+            <button onclick="closePanel()" style="background:red; color:white; border:none; padding:5px 10px; cursor:pointer; margin-top:10px;">CLOSE</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
