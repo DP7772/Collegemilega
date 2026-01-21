@@ -2,7 +2,7 @@ const { Client } = require('pg');
 
 exports.handler = async (event, context) => {
     
-    // 1. Headers
+    // 1. Headers (Frontend connection ke liye)
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
@@ -23,9 +23,9 @@ exports.handler = async (event, context) => {
         let { rank, caste, course, quota } = JSON.parse(event.body);
         const userRank = parseInt(rank);
 
-        console.log(`📥 Diamond Query Running: Rank=${userRank} | Course=${course}`);
+        console.log(`📥 Smart Logic Running: Rank=${userRank} | Course=${course}`);
 
-        // --- 2. DYNAMIC INPUTS (Parameters) ---
+        // --- 2. DYNAMIC INPUTS ---
         const coursePattern = `%${course.trim()}%`; 
 
         let casteList = [`%${caste}%`]; 
@@ -39,43 +39,47 @@ exports.handler = async (event, context) => {
 
         await client.connect();
 
-        // --- 3. TERI EXACT SQL QUERY (Parameterized) ---
+        // --- 3. SMART SQL QUERY (Priority Logic + Data Fetch) ---
         const query = `
             WITH base_data AS (
                 SELECT *
                 FROM college_cutoffs
                 WHERE 
-                    course_name ILIKE $1                 -- ✅ $1: Course
-                    AND category ILIKE ANY($2::text[])   -- ✅ $2: Caste List
-                    AND quota ILIKE ANY($3::text[])      -- ✅ $3: Quota List
-                    AND closing_rank >= $4               -- ✅ $4: User Rank
+                    course_name ILIKE $1                
+                    AND category ILIKE ANY($2::text[])  
+                    AND quota ILIKE ANY($3::text[])     
+                    AND closing_rank >= $4              
                     AND year IN (2024, 2025)
             ),
 
-            year_stats AS (
+            -- Step 1: Count karo ki college kitni baar mila (1 ya 2)
+            inst_counts AS (
                 SELECT 
                     inst_name, 
-                    course_name, 
-                    category, 
-                    quota, 
                     COUNT(DISTINCT year) AS year_count
                 FROM base_data
-                GROUP BY inst_name, course_name, category, quota
+                GROUP BY inst_name
             ),
 
-            has_two_year AS (
-                -- Check karo kya koi aisa college hai jo dono saal mila?
-                SELECT 1 
-                FROM year_stats 
-                WHERE year_count = 2 
-                LIMIT 1
+            -- Step 2: Check karo ki kya '2' count wala koi exist karta hai?
+            target_logic AS (
+                SELECT 
+                    CASE 
+                        WHEN EXISTS (SELECT 1 FROM inst_counts WHERE year_count = 2) 
+                        THEN 2  -- Agar 2 saal wale hain, to Target = 2
+                        ELSE 1  -- Warna Target = 1 (Fallback)
+                    END AS target_count
             )
 
+            -- Step 3: Final Data Fetch (Jo target logic se match kare)
             SELECT
                 b.inst_name,
-                b.course_name,
-                b.category,
-                b.quota,
+                
+                -- ✅ MAX() use karke Course Name wapas laye
+                MAX(b.course_name) AS course_name,
+                MAX(b.category) AS category,
+                MAX(b.quota) AS quota,
+                MAX(b.inst_type) AS inst_type,
 
                 -- 2025 Data
                 MAX(CASE WHEN b.year = 2025 THEN b.opening_rank END) AS opening_rank25,
@@ -86,26 +90,10 @@ exports.handler = async (event, context) => {
                 MAX(CASE WHEN b.year = 2024 THEN b.closing_rank END) AS closing_rank24
 
             FROM base_data b
-            JOIN year_stats y 
-              ON b.inst_name = y.inst_name 
-              AND b.course_name = y.course_name 
-              AND b.category = y.category 
-              AND b.quota = y.quota
+            JOIN inst_counts c ON b.inst_name = c.inst_name
+            JOIN target_logic t ON c.year_count = t.target_count -- 🔥 MAGIC FILTER
 
-            WHERE 
-                (
-                    -- SCENARIO 1: Agar 2 saal wale exist karte hain, to sirf unhe dikhao
-                    EXISTS (SELECT 1 FROM has_two_year)
-                    AND y.year_count = 2
-                )
-                OR
-                (
-                    -- SCENARIO 2: Agar 2 saal wala koi nahi hai, tabhi 1 saal wale ko aane do
-                    NOT EXISTS (SELECT 1 FROM has_two_year)
-                    AND y.year_count = 1
-                )
-
-            GROUP BY b.inst_name, b.course_name, b.category, b.quota
+            GROUP BY b.inst_name
             ORDER BY b.inst_name;
         `;
 
@@ -114,12 +102,10 @@ exports.handler = async (event, context) => {
         
         console.log(`✅ Matches Found: ${result.rowCount}`);
 
-        // --- 4. OUTPUT FORMATTING ---
+        // --- 4. FORMAT OUTPUT (Status bhi auto-detect hoga) ---
         const finalColleges = result.rows.map(row => {
             
-            // Status Logic:
-            // Agar query ne data diya hai aur usme dono saal ka data hai -> Confirmed
-            // Agar ek saal missing hai -> 50-50
+            // Logic: Agar dono saal ka data hai -> Confirmed. Warna -> Borderline.
             let statusLabel = '50-50 Chance (Borderline)';
             if (row.opening_rank24 && row.opening_rank25) {
                 statusLabel = 'Confirmed 100% (Safe)';
@@ -127,10 +113,12 @@ exports.handler = async (event, context) => {
 
             return {
                 name: row.inst_name,
+                
+                // ✅ Ab ye data 'Unknown' nahi aayega
                 course: row.course_name,   
                 category: row.category,
                 quota: row.quota,
-                type: 'Unknown', // Aggregation me type nahi tha, isliye default
+                type: row.inst_type || 'Unknown',
                 
                 status: statusLabel, 
                 
