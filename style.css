@@ -356,3 +356,159 @@ option { background: black; }
     font-weight: bold; letter-spacing: 2px;
 }
 #close-panel-btn:hover { background: #ff4444; box-shadow: 0 0 15px red; }
+
+
+/* =========================================
+   MOBILE RESPONSIVENESS (MEDIA QUERIES)
+   ========================================= */
+
+@media screen and (max-width: 768px) {
+
+    /* 1. Title Chota Karo */
+    .title-text {
+        font-size: 2.5rem; /* Font size kam kiya */
+        top: 15%; /* Thoda upar khiskaya */
+    }
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    /* 2. Form (HUD) ko Stack karo (Ek ke niche ek) */
+    .hud-grid {
+        grid-template-columns: 1fr; /* 3 column se 1 column banaya */
+        gap: 15px;
+    }
+
+    .hud-container {
+        width: 90%; /* Mobile pe full width */
+        padding: 20px;
+        bottom: 5%; /* Thoda upar */
+    }
+
+    /* 3. Sword (Talwar) ko chota karo taaki screen na bhare */
+    .sword-container {
+        transform: translate(-50%, -50%) scale(0.6); /* Size 60% kar diya */
+        top: 40%;
+    }
+
+    /* 4. Honeycomb Grid (Results) ko adjust karo */
+    .honeycomb-grid {
+        display: flex;
+        flex-direction: column; /* Hexagons ek ke niche ek */
+        align-items: center;
+        padding-top: 50px;
+        padding-bottom: 100px; /* Niche jagah chodi */
+    }
+
+    .hex {
+        margin: 10px 0; /* Gap badhaya */
+        width: 80%; /* Mobile pe thoda chouda */
+        max-width: 300px;
+    }
+
+    /* 5. College Detail Panel (Pop-up) */
+    #college-details-panel {
+        width: 90%; /* Mobile screen ka 90% lega */
+        left: 5%;
+        top: 10%;
+        transform: none; /* Centering fix */
+        height: 80vh; /* Scrollable area */
+        overflow-y: auto;
+    }
+
+    /* 6. Buttons Adjustments */
+    .space-controls {
+        width: 100%;
+        justify-content: center;
+        gap: 10px;
+        bottom: 20px;
+    }
+    
+    .nav-btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+
+    /* 7. Modal Fix */
+    .modal-terminal {
+        width: 95%;
+    }
+}
+
+/* Chote Phones ke liye (iPhone SE types) */
+@media screen and (max-width: 480px) {
+    .title-text {
+        font-size: 1.8rem;
+        top: 10%;
+    }
+    .sword-container {
+        transform: translate(-50%, -50%) scale(0.45); /* Aur chota */
+        top: 35%;
+    }
+}
+
+/* =========================================
+   CROSS-BROWSER COMPATIBILITY PATCH
+   (Safari, Firefox, Edge Fixes)
+   ========================================= */
+
+/* 1. Form Elements Reset (iPhone/Safari ke gole buttons hatane ke liye) */
+input, select, button, textarea {
+    -webkit-appearance: none; /* Safari/Chrome */
+    -moz-appearance: none;    /* Firefox */
+    appearance: none;         /* Standard */
+    border-radius: 0;         /* iPhone ka default roundness hatane ke liye */
+}
+
+/* 2. Glassmorphism Fix (Blur Effect on Safari) */
+.modal-terminal, .hud-box, #college-details-panel {
+    /* Safari ke liye special blur command */
+    -webkit-backdrop-filter: blur(10px); 
+    backdrop-filter: blur(10px);
+}
+
+/* 3. Hexagon & Shapes (Clip-path Support) */
+.hex, .blade, .guard {
+    -webkit-clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+/* 4. Text Stroke (Outline text support) */
+.title-text, .nav-brand {
+    -webkit-text-stroke: 1px cyan; /* Safari/Chrome */
+    /* Firefox standard text-stroke support kam hai, isliye text-shadow fallback */
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5); 
+}
+
+/* 5. Custom Scrollbar (Firefox Support) */
+/* Chrome/Safari already handled by ::-webkit-scrollbar */
+html, body {
+    scrollbar-width: thin;          /* Firefox: Patla scrollbar */
+    scrollbar-color: cyan #000;     /* Firefox: Cyan thumb, Black track */
+}
+
+/* 6. Animations Smoothness (Hardware Acceleration) */
+.sword-container, .hex {
+    -webkit-transform: translateZ(0); /* Safari ko force karta hai GPU use karne ko */
+    -moz-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform, opacity; /* Browser ko pehle se bata do */
+}
+
+/* 7. Selection Color (Jab text select karein) */
+::selection {
+    background: cyan;
+    color: #000;
+}
+::-moz-selection { /* Firefox Special */
+    background: cyan;
+    color: #000;
+}
+
+/* 8. Flexbox Gap Fix (Old Safari versions) */
+.hud-grid {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-gap: 15px; /* Safari */
+    gap: 15px;
+}
