@@ -359,155 +359,145 @@ option { background: black; }
 
 
 /* =========================================
-   GLOBAL RESET (Bahut Zaruri hai)
+   NUCLEAR MOBILE FIX (For 320px to 768px)
    ========================================= */
-* {
-    box-sizing: border-box; /* Isse padding se element bada nahi hota */
-}
 
-/* =========================================
-   1. TABLET & LAPTOP (Max Width: 1024px)
-   ========================================= */
-@media screen and (max-width: 1024px) {
-    .hud-container {
-        width: 80%;
-    }
-    .title-text {
-        font-size: 3rem;
-    }
-}
-
-/* =========================================
-   2. STANDARD MOBILE (Max Width: 768px)
-   ========================================= */
 @media screen and (max-width: 768px) {
-    
-    /* Title ko thoda chota aur upar */
+
+    /* 1. Body ko Scrollable banao (Agar content lamba ho jaye) */
+    body {
+        overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding-bottom: 50px; /* Niche thodi jagah */
+    }
+
+    /* 2. Title: Ab ye 'Absolute' nahi rahega. Normal flow mein aayega. */
     .title-text {
-        font-size: 2rem;
-        top: 10%;
-        width: 90%;
-        margin-left: 5%;
+        position: relative; /* Fixed hata diya */
+        top: auto;
+        left: auto;
+        transform: none;
+        margin-top: 30px; /* Upar se gap */
+        width: 100%;
+        text-align: center;
+        font-size: 1.8rem;
+        z-index: 10;
     }
+    
     .subtitle {
-        font-size: 0.9rem;
+        font-size: 0.8rem;
+        display: block;
+        margin-top: 5px;
     }
 
-    /* Talwar ko Background me bhejo aur chota karo */
+    /* 3. Sword: Isko BACKGROUND bana do (Taaki ye form ke beech na aaye) */
     .sword-container {
-        top: 40%;
-        transform: translate(-50%, -50%) scale(0.5); /* 50% size */
-        z-index: 0; /* Text ke peeche */
-        opacity: 0.6; /* Thoda transparent taaki form dikhe */
+        position: fixed; /* Screen ke piche chipka rahega */
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0.2; /* Bahut halka kar diya */
+        z-index: 0;   /* Sabse piche */
+        pointer-events: none; /* Click block nahi karega */
     }
 
-    /* Form (HUD) ko Stack karo (Ek ke niche ek) */
+    /* 4. HUD (Form): Ab ye center me, bada aur saaf dikhega */
     .hud-container {
+        position: relative; /* Fixed hata diya */
+        bottom: auto;
+        left: auto;
+        transform: none;
         width: 90%;
-        bottom: 20px;
-        padding: 15px;
-        background: rgba(0, 0, 0, 0.85); /* Darker background taaki text padh sakein */
+        margin-top: 50px; /* Title ke niche gap */
+        background: rgba(0, 0, 0, 0.8); /* Dark background */
         border: 1px solid cyan;
+        box-shadow: 0 0 15px cyan;
+        z-index: 5;
     }
 
+    /* Grid ko Single Column (Vertical) banao */
     .hud-grid {
         display: flex;
-        flex-direction: column; /* Vertical Layout */
-        gap: 10px;
+        flex-direction: column;
+        gap: 15px;
     }
 
-    .hud-box label {
-        font-size: 0.8rem;
-    }
-
-    /* Input box ki height fix */
-    input, select {
-        height: 40px; 
-        font-size: 1rem; /* iPhone pe auto-zoom rokne ke liye 16px min */
-    }
-}
-
-/* =========================================
-   3. TINY MOBILE - 320px (Mandatory Fix)
-   ========================================= */
-@media screen and (max-width: 375px) {
-    
-    /* Navbar compact karo */
-    .nav-brand {
+    /* Inputs ko ungli (Touch) ke liye bada karo */
+    select, input {
+        height: 45px; /* Height badhai */
         font-size: 1rem;
-    }
-    .nav-links {
-        display: none; /* Choti screen pe menu links hata do ya hamburger menu lagao */
-    }
-
-    /* Title ko ekdum adjust karo */
-    .title-text {
-        font-size: 1.5rem;
-        top: 50px;
-        line-height: 1.2;
-    }
-
-    /* 320px pe Talwar hata do ya ekdum choti kar do */
-    /* Kyunki keyboard khulte hi sab chup jayega */
-    .sword-container {
-        top: 30%;
-        transform: translate(-50%, -50%) scale(0.35); /* 35% Size */
-        opacity: 0.4;
-    }
-
-    /* HUD (Main Form) - Sabse Important */
-    .hud-container {
-        width: 95%; /* Full width lelo */
-        left: 2.5%;
-        bottom: 10px;
-        padding: 10px;
-        transform: none; /* Center alignment manual set ki hai */
-    }
-
-    .hud-grid {
-        gap: 8px; /* Gap kam karo */
-    }
-
-    /* Inputs ko compact karo */
-    .hud-box {
-        margin-bottom: 0;
-    }
-    
-    input, select {
-        height: 35px; /* Height kam */
-        font-size: 0.9rem;
-        padding: 5px;
+        background: rgba(0, 20, 40, 0.9);
+        width: 100%;
     }
 
     label {
-        font-size: 0.7rem;
-        margin-bottom: 2px;
+        font-size: 0.9rem;
+        color: cyan;
+        margin-bottom: 5px;
+        display: block;
     }
 
-    /* Launch Button */
+    /* 5. Button */
     #launch-btn {
-        padding: 10px;
-        font-size: 1rem;
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
         margin-top: 10px;
     }
 
-    /* Result Hexagons */
-    .hex {
-        width: 280px; /* 320px screen ke andar fit hone ke liye */
-        height: 80px;
+    /* 6. Results (Grid) Adjustments */
+    #space-view {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow-y: auto; /* Results scroll honge */
+        padding-top: 20px;
     }
     
-    /* Details Panel (Popup) */
-    #college-details-panel {
-        width: 95%;
-        left: 2.5%;
-        top: 5%;
-        height: 90vh;
+    .honeycomb-grid {
+        padding-bottom: 150px; /* Niche controls ke liye jagah */
+    }
+
+    /* 7. Controls (Back/Next) */
+    .space-controls {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: black;
+        padding: 10px;
+        z-index: 20;
+    }
+}
+
+/* =========================================
+   ULTRA SMALL (320px - iPhone 5/SE) Specific
+   ========================================= */
+@media screen and (max-width: 360px) {
+    .title-text {
+        font-size: 1.5rem;
+        margin-top: 15px;
+    }
+
+    .hud-container {
+        margin-top: 20px;
         padding: 15px;
     }
     
-    #college-details-panel h2 {
-        font-size: 1.2rem;
+    .sword-container {
+        opacity: 0.15; /* Aur halka */
+    }
+    
+    select, input {
+        height: 40px; /* Thoda chota taaki fit ho */
+        font-size: 0.9rem;
     }
 }
 /* =========================================
