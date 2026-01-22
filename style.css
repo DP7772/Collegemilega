@@ -361,137 +361,186 @@ option { background: black; }
 
 
 /* =========================================
-   MOBILE & TABLET OVERRIDE (Forced Mode)
+   MOBILE RESPONSIVE FIX (CLEAN MODE)
    ========================================= */
 
 @media screen and (max-width: 768px) {
 
-    /* 1. BODY KO SCROLLABLE BANAO */
+    /* --- 1. GENERAL SETUP --- */
     body {
-        overflow-y: auto !important; /* Scroll on */
+        overflow-y: auto !important; /* Scroll allow karo */
         height: auto !important;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding-bottom: 50px;
-        background: #000; /* Safety background */
+        background: #050505; /* Pitch black background */
+        padding-bottom: 80px; /* Niche buttons ke liye jagah */
     }
 
-    /* 2. TITLE KO CHOTA AUR UPAR RAKHO */
+    /* --- 2. TALWAR HATAO (Space Bachao) --- */
+    .sword-container {
+        display: none !important;
+    }
+
+    /* --- 3. TITLE ADJUSTMENT --- */
     .title-text {
-        position: relative !important; /* Fixed hatao */
+        position: relative !important;
         top: 0 !important;
         left: 0 !important;
         transform: none !important;
         margin-top: 20px;
-        font-size: 1.5rem !important; /* Chota font */
+        font-size: 1.8rem !important;
         width: 100%;
         text-align: center;
+        text-shadow: 0 0 10px cyan;
     }
+
     .subtitle {
-        font-size: 0.8rem !important;
-        margin-top: 5px;
+        font-size: 0.9rem !important;
+        margin-bottom: 20px;
     }
 
-    /* 3. SWORD KO GAYAB/BACKGROUND KARO (Sabse bada dushman yahi hai space ka) */
-    .sword-container {
-        position: fixed !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) scale(0.4) !important;
-        opacity: 0.1 !important; /* Ekdum halka kar diya */
-        z-index: 0 !important;   /* Piche bhejo */
-        pointer-events: none;    /* Click na ho paye */
-    }
-
-    /* 4. MAIN FORM (HUD) - AB YE NORMAL DIKHEGA */
+    /* --- 4. INPUT FORM (HUD) - SIMPLE CARD LOOK --- */
     .hud-container {
-        position: relative !important; /* Fixed hatao */
+        position: relative !important;
         bottom: auto !important;
         left: auto !important;
         transform: none !important;
-        
         width: 90% !important;
-        margin-top: 30px; /* Title se gap */
-        padding: 20px !important;
+        margin: 0 auto !important; /* Center me lao */
         
-        /* Dark Background taaki stars text ko kharab na karein */
-        background: rgba(0, 10, 20, 0.95) !important; 
-        border: 1px solid cyan !important;
+        background: rgba(0, 20, 30, 0.95) !important; /* Dark Blue Card */
+        border: 2px solid cyan !important;
         border-radius: 10px;
-        z-index: 10 !important; /* Sabse upar */
+        padding: 20px !important;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
     }
 
-    /* Grid ko line me lao */
     .hud-grid {
         display: flex !important;
         flex-direction: column !important;
         gap: 15px !important;
     }
 
-    /* 5. INPUTS KO BADA AUR SAAF KARO */
+    /* Inputs ko bada aur saaf karo */
     .hud-box {
         width: 100% !important;
-        margin-bottom: 0 !important;
     }
 
     label {
         font-size: 0.9rem !important;
-        color: cyan !important;
-        margin-bottom: 5px !important;
+        color: #fff !important;
+        margin-bottom: 5px;
         display: block;
-        text-align: left;
     }
 
     select, input {
         width: 100% !important;
-        height: 50px !important; /* Bada touch area */
-        font-size: 1rem !important;
-        background: #001a33 !important;
-        color: white !important;
-        border: 1px solid rgba(0, 255, 255, 0.3) !important;
+        height: 50px !important;
+        background: #000 !important;
+        color: cyan !important;
+        border: 1px solid #333 !important;
         border-radius: 5px !important;
-        padding: 0 10px !important;
+        font-size: 1rem !important;
+        padding-left: 10px;
     }
 
-    /* 6. BUTTON */
+    /* CHECK FUTURE BUTTON */
     #launch-btn {
         width: 100% !important;
-        margin-top: 20px;
         padding: 15px !important;
         font-size: 1.2rem !important;
-        background: cyan !important;
-        color: black !important;
-        border-radius: 5px !important;
-        cursor: pointer;
+        margin-top: 10px;
+        background: linear-gradient(45deg, cyan, blue);
+        color: white;
+        border: none;
+        border-radius: 5px;
     }
 
-    /* 7. RESULT VIEW KO ADJUST KARO */
+    /* --- 5. RESULT SECTION (Important Fix) --- */
     #space-view {
-        padding-top: 60px !important; /* Upar jagah chodo */
-        background: rgba(0,0,0,0.9); /* Result ke piche dark background */
+        position: fixed !important; /* Pure screen pe */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        overflow-y: auto !important; /* Results scroll honge */
+        padding-top: 60px; /* Upar jagah */
+        z-index: 100;
     }
 
     .honeycomb-grid {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding-bottom: 100px;
+        display: flex !important;
+        flex-direction: column !important; /* Line me */
+        align-items: center !important;
+        padding-bottom: 100px; /* Niche buttons ke liye gap */
+        width: 100%;
     }
 
+    /* Hexagon ko Mobile pe RECTANGLE bana diya (Better Readability) */
     .hex {
-        width: 280px !important; /* Mobile width fit */
+        width: 90% !important;
+        height: auto !important; /* Height content ke hisab se */
+        min-height: 60px;
+        background: rgba(0, 255, 255, 0.1) !important;
+        border: 1px solid cyan !important;
         margin: 10px 0 !important;
+        clip-path: none !important; /* Hexagon shape hata diya */
+        border-radius: 8px !important;
+        
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+        
+        font-size: 1rem !important;
+        color: white !important;
+        text-align: center;
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
     }
 
-    /* 8. POPUP MODAL (DETAILS) */
+    /* --- 6. NAVIGATION BUTTONS (FIXED BOTTOM) --- */
+    .space-controls {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 70px;
+        background: #111 !important; /* Black Bar */
+        border-top: 1px solid cyan;
+        
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 0 20px !important;
+        z-index: 200; /* Sabse upar */
+    }
+
+    .nav-btn {
+        width: 30% !important; /* Buttons barabar size ke */
+        padding: 10px 0 !important;
+        font-size: 0.8rem !important;
+        text-align: center;
+    }
+    
+    /* Center wala button (Red) */
+    #back-btn {
+        background: red !important;
+        color: white !important;
+        border: none;
+    }
+
+    /* --- 7. COLLEGE DETAILS POPUP --- */
     #college-details-panel {
         width: 95% !important;
-        height: 80vh !important;
-        top: 10% !important;
+        height: 85% !important;
+        top: 5% !important;
         left: 2.5% !important;
         transform: none !important;
+        border-radius: 10px;
+        overflow-y: auto;
     }
 }
 /* =========================================
