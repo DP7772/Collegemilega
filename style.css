@@ -358,146 +358,140 @@ option { background: black; }
 #close-panel-btn:hover { background: #ff4444; box-shadow: 0 0 15px red; }
 
 
+
+
 /* =========================================
-   NUCLEAR MOBILE FIX (For 320px to 768px)
+   MOBILE & TABLET OVERRIDE (Forced Mode)
    ========================================= */
 
 @media screen and (max-width: 768px) {
 
-    /* 1. Body ko Scrollable banao (Agar content lamba ho jaye) */
+    /* 1. BODY KO SCROLLABLE BANAO */
     body {
-        overflow-y: auto;
-        height: auto;
+        overflow-y: auto !important; /* Scroll on */
+        height: auto !important;
         min-height: 100vh;
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
         align-items: center;
-        padding-bottom: 50px; /* Niche thodi jagah */
+        padding-bottom: 50px;
+        background: #000; /* Safety background */
     }
 
-    /* 2. Title: Ab ye 'Absolute' nahi rahega. Normal flow mein aayega. */
+    /* 2. TITLE KO CHOTA AUR UPAR RAKHO */
     .title-text {
-        position: relative; /* Fixed hata diya */
-        top: auto;
-        left: auto;
-        transform: none;
-        margin-top: 30px; /* Upar se gap */
+        position: relative !important; /* Fixed hatao */
+        top: 0 !important;
+        left: 0 !important;
+        transform: none !important;
+        margin-top: 20px;
+        font-size: 1.5rem !important; /* Chota font */
         width: 100%;
         text-align: center;
-        font-size: 1.8rem;
-        z-index: 10;
     }
-    
     .subtitle {
-        font-size: 0.8rem;
-        display: block;
+        font-size: 0.8rem !important;
         margin-top: 5px;
     }
 
-    /* 3. Sword: Isko BACKGROUND bana do (Taaki ye form ke beech na aaye) */
+    /* 3. SWORD KO GAYAB/BACKGROUND KARO (Sabse bada dushman yahi hai space ka) */
     .sword-container {
-        position: fixed; /* Screen ke piche chipka rahega */
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(0.5);
-        opacity: 0.2; /* Bahut halka kar diya */
-        z-index: 0;   /* Sabse piche */
-        pointer-events: none; /* Click block nahi karega */
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) scale(0.4) !important;
+        opacity: 0.1 !important; /* Ekdum halka kar diya */
+        z-index: 0 !important;   /* Piche bhejo */
+        pointer-events: none;    /* Click na ho paye */
     }
 
-    /* 4. HUD (Form): Ab ye center me, bada aur saaf dikhega */
+    /* 4. MAIN FORM (HUD) - AB YE NORMAL DIKHEGA */
     .hud-container {
-        position: relative; /* Fixed hata diya */
-        bottom: auto;
-        left: auto;
-        transform: none;
-        width: 90%;
-        margin-top: 50px; /* Title ke niche gap */
-        background: rgba(0, 0, 0, 0.8); /* Dark background */
-        border: 1px solid cyan;
-        box-shadow: 0 0 15px cyan;
-        z-index: 5;
+        position: relative !important; /* Fixed hatao */
+        bottom: auto !important;
+        left: auto !important;
+        transform: none !important;
+        
+        width: 90% !important;
+        margin-top: 30px; /* Title se gap */
+        padding: 20px !important;
+        
+        /* Dark Background taaki stars text ko kharab na karein */
+        background: rgba(0, 10, 20, 0.95) !important; 
+        border: 1px solid cyan !important;
+        border-radius: 10px;
+        z-index: 10 !important; /* Sabse upar */
     }
 
-    /* Grid ko Single Column (Vertical) banao */
+    /* Grid ko line me lao */
     .hud-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
     }
 
-    /* Inputs ko ungli (Touch) ke liye bada karo */
-    select, input {
-        height: 45px; /* Height badhai */
-        font-size: 1rem;
-        background: rgba(0, 20, 40, 0.9);
-        width: 100%;
+    /* 5. INPUTS KO BADA AUR SAAF KARO */
+    .hud-box {
+        width: 100% !important;
+        margin-bottom: 0 !important;
     }
 
     label {
-        font-size: 0.9rem;
-        color: cyan;
-        margin-bottom: 5px;
+        font-size: 0.9rem !important;
+        color: cyan !important;
+        margin-bottom: 5px !important;
         display: block;
+        text-align: left;
     }
 
-    /* 5. Button */
-    #launch-btn {
-        width: 100%;
-        padding: 15px;
-        font-size: 1.1rem;
-        margin-top: 10px;
-    }
-
-    /* 6. Results (Grid) Adjustments */
-    #space-view {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        overflow-y: auto; /* Results scroll honge */
-        padding-top: 20px;
-    }
-    
-    .honeycomb-grid {
-        padding-bottom: 150px; /* Niche controls ke liye jagah */
-    }
-
-    /* 7. Controls (Back/Next) */
-    .space-controls {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background: black;
-        padding: 10px;
-        z-index: 20;
-    }
-}
-
-/* =========================================
-   ULTRA SMALL (320px - iPhone 5/SE) Specific
-   ========================================= */
-@media screen and (max-width: 360px) {
-    .title-text {
-        font-size: 1.5rem;
-        margin-top: 15px;
-    }
-
-    .hud-container {
-        margin-top: 20px;
-        padding: 15px;
-    }
-    
-    .sword-container {
-        opacity: 0.15; /* Aur halka */
-    }
-    
     select, input {
-        height: 40px; /* Thoda chota taaki fit ho */
-        font-size: 0.9rem;
+        width: 100% !important;
+        height: 50px !important; /* Bada touch area */
+        font-size: 1rem !important;
+        background: #001a33 !important;
+        color: white !important;
+        border: 1px solid rgba(0, 255, 255, 0.3) !important;
+        border-radius: 5px !important;
+        padding: 0 10px !important;
+    }
+
+    /* 6. BUTTON */
+    #launch-btn {
+        width: 100% !important;
+        margin-top: 20px;
+        padding: 15px !important;
+        font-size: 1.2rem !important;
+        background: cyan !important;
+        color: black !important;
+        border-radius: 5px !important;
+        cursor: pointer;
+    }
+
+    /* 7. RESULT VIEW KO ADJUST KARO */
+    #space-view {
+        padding-top: 60px !important; /* Upar jagah chodo */
+        background: rgba(0,0,0,0.9); /* Result ke piche dark background */
+    }
+
+    .honeycomb-grid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-bottom: 100px;
+    }
+
+    .hex {
+        width: 280px !important; /* Mobile width fit */
+        margin: 10px 0 !important;
+    }
+
+    /* 8. POPUP MODAL (DETAILS) */
+    #college-details-panel {
+        width: 95% !important;
+        height: 80vh !important;
+        top: 10% !important;
+        left: 2.5% !important;
+        transform: none !important;
     }
 }
 /* =========================================
