@@ -44,15 +44,15 @@ Designed for speed, scalability, and visual impact.
 
 ### 1. The Warp Interface (Landing)
 *A minimalistic, high-tech entry point featuring a dynamic energy sword animation.*
-![Landing](./screenshots/landing.png)
+![Landing](landing.png)
 
 ### 2. The Galactic Grid (Data Visualization)
 *Results are rendered as a honeycomb grid floating in space, offering a unique browsing experience.*
-![Results](./screenshots/results.png)
+![Results](results.png)
 
 ### 3. Holographic Analysis (Deep Dive)
 *Clicking a node opens a detailed HUD showing exact cutoff comparisons for multiple years.*
-![Details](./screenshots/details.png)
+![Details](details.png)
 
 ---
 
