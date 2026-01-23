@@ -266,7 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.closePanel = () => { document.getElementById('college-details-panel').style.display = 'none'; };
 
-    // --- 9. MISSION LOG & CAREER GUIDANCE (FINAL CORRECTED) ---
+    // --- 9. MISSION LOG & CAREER GUIDANCE (UPDATED) ---
     const aboutBtn = document.getElementById('open-about');
     const closeAboutBtn = document.getElementById('close-about');
     const aboutModal = document.getElementById('about-modal');
@@ -336,7 +336,9 @@ analyzing multi-year cutoff trends.
         
         // Show Modal
         aboutModal.classList.add('active'); 
-        playSound('ui_click.mp3'); 
+        
+        // 🔥 SOUND UPDATED: Shoot.wav
+        playSound('Shoot.wav'); 
         
         // --- RESET LOGIC (Shuru se shuru) ---
         typingArea.innerHTML = ''; // Clear old text
@@ -361,9 +363,7 @@ analyzing multi-year cutoff trends.
         }
     });
 
-}); 
-
-// --- 10. CONTACT COMMS LINK (NEW) ---
+    // --- 10. CONTACT COMMS LINK (INSIDE DOMContentLoaded NOW) ---
     const contactBtn = document.querySelector('a[href="#contact"]'); // Navbar Link
     const contactModal = document.getElementById('contact-modal');
     const closeContactBtn = document.getElementById('close-contact');
@@ -373,7 +373,9 @@ analyzing multi-year cutoff trends.
         contactBtn.addEventListener('click', (e) => {
             e.preventDefault();
             contactModal.classList.add('active');
-            playSound('Sci-Fi.wav'); // Open sound
+            
+            // 🔥 SOUND UPDATED: Sci-Fi.wav
+            playSound('Sci-Fi.wav'); 
         });
     }
 
@@ -391,4 +393,4 @@ analyzing multi-year cutoff trends.
         }
     });
 
-// End of DOMContentLoaded
+}); // 🔥 DOMContentLoaded ENDS HERE (Sabse Last Mein)
