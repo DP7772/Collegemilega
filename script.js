@@ -38,10 +38,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- 🔥 NEW: CUSTOM TOAST FUNCTION ---
     const showToast = (message, isError = false) => {
-        // 1. Text Set Karo
+        // 1. Text
         toastMsg.innerText = message;
         
-        // 2. Style Set Karo (Error vs Info)
+        // 2.(Error vs Info)
         if (isError) {
             toast.classList.add('error');
             toastIcon.innerText = "⚠️";
@@ -243,8 +243,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.closePanel = () => { document.getElementById('college-details-panel').style.display = 'none'; };
 
-    nextBtn.addEventListener('click', () => { playSound('Sci-Fi.wav'); currentPage++; renderSpaceGrid(); });
-    prevBtn.addEventListener('click', () => { playSound('Sci-Fi.wav'); currentPage--; renderSpaceGrid(); });
+    nextBtn.addEventListener('click', () => { playSound('Shoot Drone.wav'); currentPage++; renderSpaceGrid(); });
+    prevBtn.addEventListener('click', () => { playSound('Shoot Drone.wav'); currentPage--; renderSpaceGrid(); });
 
     // --- 8. RETURN ---
     backBtn.addEventListener('click', () => {
@@ -393,4 +393,4 @@ analyzing multi-year cutoff trends.
         }
     });
 
-}); // 🔥 DOMContentLoaded ENDS HERE (Sabse Last Mein)
+}); // 🔥 DOMContentLoaded ENDS HERE
