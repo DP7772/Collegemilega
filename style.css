@@ -1,7 +1,7 @@
 /* --- 1. BASIC RESET --- */
 body {
     margin: 0;
-    overflow: hidden;
+    overflow: hidden; /* Desktop app style - no scroll */
     background-color: black;
     font-family: 'Courier New', Courier, monospace;
     display: flex; justify-content: center; align-items: center;
@@ -184,12 +184,6 @@ option { background: black; }
 .nav-btn.red:hover { background: red; color: white; box-shadow: 0 0 20px red; }
 .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-#college-details-panel {
-    position: absolute; bottom: 80px; width: 300px; padding: 20px;
-    background: rgba(0,0,0,0.9); border: 2px solid cyan; color: white;
-    text-align: center; display: none; box-shadow: 0 0 50px rgba(0,255,255,0.3); z-index: 70;
-}
-
 /* --- KEYFRAMES --- */
 @keyframes dropSword { 0% { transform: translateY(-1000px) rotate(180deg); opacity: 0; } 100% { transform: translateY(0) rotate(0deg); opacity: 1; } }
 @keyframes rocketLaunch { 0% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 20px red); } 40% { transform: translateY(50px) scale(0.9); } 100% { transform: translateY(-2000px) scale(0.5); opacity: 0; } }
@@ -271,7 +265,7 @@ option { background: black; }
     font-weight: bold; cursor: pointer; font-size: 1.2rem;
 }
 
-/* --- YAHAN CHANGE KIYA HAI (SCROLL LOGIC) --- */
+/* --- SCROLL LOGIC --- */
 .terminal-body { 
     padding: 20px; 
     color: #0f0; 
@@ -313,14 +307,14 @@ option { background: black; }
 #college-details-panel {
     position: absolute; 
     top: 50%; left: 50%; transform: translate(-50%, -50%); /* Center Screen */
-    width: 90%; max-width: 500px;
+    width: 500px; /* Fixed Width for Desktop */
     padding: 30px;
     background: rgba(0, 10, 20, 0.95);
     border: 2px solid cyan;
     box-shadow: 0 0 50px rgba(0, 255, 255, 0.2);
     z-index: 1000;
-    text-align: left; /* Text align left for data */
-    display: none; /* Hidden by default */
+    text-align: left;
+    display: none; 
 }
 
 #college-details-panel h2 {
@@ -358,14 +352,14 @@ option { background: black; }
 #close-panel-btn:hover { background: #ff4444; box-shadow: 0 0 15px red; }
 
 /* =========================================
-   CUSTOM SYSTEM TOAST (RIGHT SIDE SLIDE)
+   CUSTOM SYSTEM TOAST (DESKTOP FIXED)
    ========================================= */
 #system-toast {
     position: fixed;
-    bottom: 30px;        /* Niche se thoda upar */
-    right: -450px;       /* Screen ke bahar (Right side) chupa hua */
-    left: auto;          /* Center alignment hata diya */
-    transform: none;     /* Transform hata diya */
+    bottom: 30px;        
+    right: -450px;       /* Initially Hidden Right */
+    left: auto;          
+    transform: none;     
     
     background: rgba(0, 10, 20, 0.95);
     border: 1px solid cyan;
@@ -379,15 +373,15 @@ option { background: black; }
     font-size: 1rem;
     z-index: 9999;
     
-    transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smooth Slide from Right */
+    transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: flex;
     flex-direction: column;
     gap: 5px;
     min-width: 300px;
-    text-align: left; /* Text left align for better reading */
+    text-align: left; 
 }
 
-/* Jab active hoga tab Right side me dikhega */
+/* Active State (Slides in) */
 #system-toast.active {
     right: 30px; 
 }
@@ -399,12 +393,12 @@ option { background: black; }
     box-shadow: 0 0 20px rgba(255, 51, 51, 0.3);
 }
 
-/* Scanning Line Animation (2 Seconds) */
+/* Scanning Line Animation */
 .toast-line {
     width: 0%;
     height: 3px;
     background: cyan;
-    transition: width 2s linear; /* 🔥 Updated to 2 Seconds */
+    transition: width 2s linear; 
 }
 
 #system-toast.active .toast-line {
@@ -415,29 +409,14 @@ option { background: black; }
     background: #ff3333;
 }
 
-/* Mobile Fix (Mobile pe Right se aayega par width adjust hogi) */
-@media screen and (max-width: 480px) {
-    #system-toast {
-        width: 90%;
-        font-size: 0.9rem;
-        bottom: 20px;
-        /* Mobile pe right se slide karega par margin maintain karega */
-    }
-    #system-toast.active {
-        right: 5%; /* 5% gap from right */
-    }
-}
-
-
 /* =========================================
-   CONTACT MODAL (HOLOGRAPHIC CARD)
+   CONTACT MODAL (DESKTOP CARD)
    ========================================= */
 .contact-box {
     background: rgba(5, 15, 30, 0.95);
     border: 1px solid cyan;
     box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
-    width: 400px;
-    max-width: 90%;
+    width: 400px; /* Fixed Width */
     border-radius: 10px;
     padding: 20px;
     text-align: center;
@@ -451,22 +430,21 @@ option { background: black; }
     transform: translate(-50%, -50%);
 }
 
-/* --- 🔥 UPDATED PROFILE SECTION FOR IMAGE --- */
+/* --- PROFILE SECTION --- */
 .holo-profile {
-    width: 90px;  /* Thoda sa bada kiya (80px se 90px) */
+    width: 90px;  
     height: 90px;
     margin: 0 auto 15px;
     
-    background: #000; /* Background black taaki photo pop kare */
+    background: #000; 
     border-radius: 50%;
-    border: 2px solid cyan; /* Dashed hata ke Solid kiya taaki frame lage */
-    box-shadow: 0 0 15px cyan; /* Glow effect add kiya */
+    border: 2px solid cyan; 
+    box-shadow: 0 0 15px cyan; 
     
     position: relative;
-    overflow: hidden; /* Photo ko circle ke bahar jaane se rokega */
+    overflow: hidden; 
 }
 
-/* Nayi Class: Photo ko perfect fit karegi */
 .profile-pic {
     width: 100%;
     height: 100%;
@@ -479,13 +457,13 @@ option { background: black; }
 .scan-line {
     position: absolute;
     width: 100%;
-    height: 2px; /* Scan line thodi patli rakhi */
+    height: 2px; 
     background: rgba(0, 255, 255, 0.9);
     top: 0;
     left: 0;
-    animation: scanAnim 2.5s linear infinite; /* Animation speed thodi slow ki */
+    animation: scanAnim 2.5s linear infinite; 
     box-shadow: 0 0 10px cyan;
-    z-index: 5; /* Photo ke upar dikhega */
+    z-index: 5; 
 }
 
 @keyframes scanAnim {
@@ -494,7 +472,7 @@ option { background: black; }
     100% { top: 100%; opacity: 0; }
 }
 
-/* --- REST OF THE CODE (EXACTLY SAME AS BEFORE) --- */
+/* --- REST OF THE CODE --- */
 .dev-details h2 {
     color: white;
     font-size: 1.8rem;
