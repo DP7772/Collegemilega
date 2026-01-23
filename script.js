@@ -393,4 +393,20 @@ analyzing multi-year cutoff trends.
         }
     });
 
+    // --- 11. FOOTER LIVE STATS (FAKE ANIMATION) ---
+    const pingElement = document.querySelector('.changing-num');
+    
+    if(pingElement) {
+        setInterval(() => {
+            // Random number between 10 and 45
+            const randomPing = Math.floor(Math.random() * (45 - 10 + 1) + 10);
+            pingElement.innerText = `${randomPing}ms`;
+            
+            // Colour change logic (High ping = Red)
+            if(randomPing > 40) pingElement.style.color = 'red';
+            else pingElement.style.color = 'cyan';
+            
+        }, 2000); // Har 2 second me change hoga
+    }
+
 }); // 🔥 DOMContentLoaded ENDS HERE
