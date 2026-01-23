@@ -274,7 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // 🔥 UPDATED TEXT: Positions tool as AI Career Guidance
     const aboutText = `
-> SYSTEM: COLLEGEMILEGA_V2.0
+> SYSTEM: COLLEGEMILEGA_V1.0
 > MODULE: AI_CAREER_GUIDANCE
 > DATA SOURCE: 2024-25 MERIT DATABASE
 
