@@ -357,15 +357,15 @@ option { background: black; }
 }
 #close-panel-btn:hover { background: #ff4444; box-shadow: 0 0 15px red; }
 
-
 /* =========================================
-   CUSTOM SYSTEM TOAST (ALERT REPLACEMENT)
+   CUSTOM SYSTEM TOAST (RIGHT SIDE SLIDE)
    ========================================= */
 #system-toast {
     position: fixed;
-    bottom: -100px; /* Screen ke niche chupa hua */
-    left: 50%;
-    transform: translateX(-50%);
+    bottom: 30px;        /* Niche se thoda upar */
+    right: -450px;       /* Screen ke bahar (Right side) chupa hua */
+    left: auto;          /* Center alignment hata diya */
+    transform: none;     /* Transform hata diya */
     
     background: rgba(0, 10, 20, 0.95);
     border: 1px solid cyan;
@@ -377,34 +377,34 @@ option { background: black; }
     font-family: 'Courier New', Courier, monospace;
     font-weight: bold;
     font-size: 1rem;
-    z-index: 9999; /* Sabse upar */
+    z-index: 9999;
     
-    transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smooth Pop-up */
+    transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smooth Slide from Right */
     display: flex;
     flex-direction: column;
     gap: 5px;
     min-width: 300px;
-    text-align: center;
+    text-align: left; /* Text left align for better reading */
 }
 
-/* Jab active hoga tab upar aayega */
+/* Jab active hoga tab Right side me dikhega */
 #system-toast.active {
-    bottom: 30px; 
+    right: 30px; 
 }
 
-/* Error Mode (Red Color) */
+/* Error Mode */
 #system-toast.error {
     border-color: #ff3333;
     color: #ff3333;
     box-shadow: 0 0 20px rgba(255, 51, 51, 0.3);
 }
 
-/* Scanning Line Animation inside Alert */
+/* Scanning Line Animation (2 Seconds) */
 .toast-line {
     width: 0%;
-    height: 2px;
+    height: 3px;
     background: cyan;
-    transition: width 3s linear; /* Timer bar */
+    transition: width 2s linear; /* 🔥 Updated to 2 Seconds */
 }
 
 #system-toast.active .toast-line {
@@ -415,12 +415,15 @@ option { background: black; }
     background: #ff3333;
 }
 
-/* Mobile Fix */
+/* Mobile Fix (Mobile pe Right se aayega par width adjust hogi) */
 @media screen and (max-width: 480px) {
     #system-toast {
         width: 90%;
         font-size: 0.9rem;
+        bottom: 20px;
+        /* Mobile pe right se slide karega par margin maintain karega */
+    }
+    #system-toast.active {
+        right: 5%; /* 5% gap from right */
     }
 }
-
-
