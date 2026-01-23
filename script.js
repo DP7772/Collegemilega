@@ -146,7 +146,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         pageItems.forEach((col, index) => {
             const hex = document.createElement('div');
-            hex.className = `hex safe`; 
+            
+            // Status Logic (Green/Orange) for Hexagon Border
+            const isSafe = col.status.includes('Confirmed');
+            hex.className = isSafe ? 'hex safe' : 'hex risky'; 
+            hex.style.borderColor = isSafe ? '#00ff00' : '#ffae00';
+            hex.style.boxShadow = `0 0 10px ${isSafe ? '#00ff00' : '#ffae00'}`;
+
             hex.innerText = col.name;
             hex.style.animationDelay = `${index * 0.1}s`; 
             
@@ -156,33 +162,81 @@ document.addEventListener("DOMContentLoaded", () => {
             hex.addEventListener('click', () => {
                 const panel = document.getElementById('college-details-panel');
                 
-                // HTML Create karo dynamic data ke sath
+                // --- 🔥 UPDATED HTML STRUCTURE ---
+                // Added Course, Category, and Quota display
                 panel.innerHTML = `
-                    <h2>${col.name}</h2>
+                    <h2 style="
+                        color: cyan; 
+                        border-bottom: 2px solid cyan; 
+                        padding-bottom: 10px; 
+                        font-size: 1.5rem; 
+                        text-align: center;
+                    ">${col.name}</h2>
                     
-                    <div class="detail-row">
-                        <span class="detail-label">INSTITUTE TYPE</span>
-                        <span class="detail-value">${col.type}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">PREDICTION</span>
-                        <span class="detail-value" style="color:cyan">100% CONFIRMED</span>
+                    <div style="
+                        background: rgba(0,20,40,0.6); 
+                        padding: 15px; 
+                        border-radius: 8px; 
+                        margin: 15px 0; 
+                        text-align: left; 
+                        border: 1px solid cyan;
+                    ">
+                        <p style="margin: 5px 0; font-size: 1.1rem; color: #fff;">
+                            <span style="color: cyan; font-weight: bold;">COURSE:</span> ${col.course}
+                        </p>
+                        
+                        <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                            <p style="margin: 0; color: #ccc;">
+                                <span style="color: cyan; font-weight: bold;">CAT:</span> ${col.category}
+                            </p>
+                            <p style="margin: 0; color: #ccc;">
+                                <span style="color: cyan; font-weight: bold;">QUOTA:</span> ${col.quota}
+                            </p>
+                        </div>
+                        
+                        <p style="margin: 10px 0 0 0; color: #ccc;">
+                            <span style="color: cyan; font-weight: bold;">TYPE:</span> ${col.type}
+                        </p>
                     </div>
 
-                    <div class="year-grid">
-                        <div class="year-box">
-                            <span class="year-title">2024 CUTOFF</span>
-                            <div class="rank-data">Open: ${col.details.y24.open}</div>
-                            <div class="rank-data">Close: ${col.details.y24.close}</div>
+                    <div class="detail-row" style="text-align: center; margin: 15px 0;">
+                        <span class="detail-value" style="
+                            color:${isSafe ? '#00ff00' : '#ffae00'}; 
+                            font-size: 1.2rem; 
+                            border: 1px dashed ${isSafe ? '#00ff00' : '#ffae00'}; 
+                            padding: 8px 15px; 
+                            border-radius: 5px;
+                            display: block;
+                        ">
+                            ${col.status}
+                        </span>
+                    </div>
+
+                    <div class="year-grid" style="display: flex; gap: 10px; justify-content: center;">
+                        <div class="year-box" style="flex: 1; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; text-align: center;">
+                            <span class="year-title" style="color: cyan; display: block; margin-bottom: 5px; font-weight: bold;">2024 CUTOFF</span>
+                            <div class="rank-data" style="color: white;">Open: ${col.details.y24.open}</div>
+                            <div class="rank-data" style="color: white;">Close: ${col.details.y24.close}</div>
                         </div>
-                        <div class="year-box">
-                            <span class="year-title">2025 CUTOFF</span>
-                            <div class="rank-data">Open: ${col.details.y25.open}</div>
-                            <div class="rank-data">Close: ${col.details.y25.close}</div>
+                        <div class="year-box" style="flex: 1; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; text-align: center;">
+                            <span class="year-title" style="color: cyan; display: block; margin-bottom: 5px; font-weight: bold;">2025 CUTOFF</span>
+                            <div class="rank-data" style="color: white;">Open: ${col.details.y25.open}</div>
+                            <div class="rank-data" style="color: white;">Close: ${col.details.y25.close}</div>
                         </div>
                     </div>
 
-                    <button id="close-panel-btn" onclick="closePanel()">CLOSE SYSTEM</button>
+                    <button id="close-panel-btn" onclick="closePanel()" style="
+                        background: linear-gradient(45deg, #ff0000, #990000); 
+                        color: white; 
+                        width: 100%; 
+                        padding: 12px; 
+                        border: none; 
+                        margin-top: 20px; 
+                        cursor: pointer; 
+                        font-weight: bold; 
+                        border-radius: 5px;
+                        box-shadow: 0 0 10px red;
+                    ">CLOSE SYSTEM</button>
                 `;
                 
                 panel.style.display = 'block';
