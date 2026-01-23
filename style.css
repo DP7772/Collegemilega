@@ -571,14 +571,15 @@ option { background: black; }
 }
 
 /* =========================================
-   SCI-FI HUD FOOTER
+   SCI-FI HUD FOOTER (SCROLLABLE)
    ========================================= */
 .hud-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
+    position: relative; /* ✅ Fixed hata diya, ab ye page ke end me aayega */
+    margin-top: 100px;  /* ✅ Upar wale content se thoda dur rakha */
     width: 100%;
-    height: 40px;
+    height: auto;       /* Height auto rakhi taaki content na kate */
+    min-height: 40px;
+    
     background: rgba(0, 5, 10, 0.95);
     border-top: 1px solid cyan;
     box-shadow: 0 -5px 15px rgba(0, 255, 255, 0.1);
@@ -586,12 +587,12 @@ option { background: black; }
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
+    padding: 10px 20px; /* Padding thodi badhai */
     
     font-family: 'Courier New', Courier, monospace;
     font-size: 0.75rem;
     color: cyan;
-    z-index: 1000; /* Sabse upar */
+    z-index: 10;
     backdrop-filter: blur(5px);
 }
 
@@ -609,10 +610,8 @@ option { background: black; }
 }
 
 .left {
-    width: 35%;
-    overflow: hidden;
-    white-space: nowrap;
-    color: #ffae00; /* Orange/Yellow for warning */
+    width: 40%;
+    color: #ffae00;
 }
 
 /* Center: Copyright */
@@ -620,11 +619,14 @@ option { background: black; }
     font-weight: bold;
     letter-spacing: 2px;
     text-shadow: 0 0 5px cyan;
+    text-align: center;
 }
 
 /* Right: Stats */
 .right {
     gap: 15px;
+    justify-content: flex-end;
+    width: 30%;
 }
 
 .stat-item {
@@ -645,17 +647,17 @@ option { background: black; }
 /* Mobile Responsiveness */
 @media screen and (max-width: 768px) {
     .hud-footer {
-        font-size: 0.6rem;
         flex-direction: column;
-        height: auto;
-        padding: 5px;
-        gap: 2px;
+        gap: 10px;
+        text-align: center;
+        padding-bottom: 20px;
     }
     .left, .center, .right {
         width: 100%;
         justify-content: center;
     }
-    .right {
-        display: none; /* Mobile pe stats chupa do taaki clutter na ho */
+    .left {
+        font-size: 0.6rem; /* Disclaimer chota kiya mobile ke liye */
+        white-space: normal; /* Text wrap hone do */
     }
 }
