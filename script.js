@@ -243,8 +243,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.closePanel = () => { document.getElementById('college-details-panel').style.display = 'none'; };
 
-    nextBtn.addEventListener('click', () => { playSound('Shoot Drone.wav'); currentPage++; renderSpaceGrid(); });
-    prevBtn.addEventListener('click', () => { playSound('Shoot Drone.wav'); currentPage--; renderSpaceGrid(); });
+    nextBtn.addEventListener('click', () => { playSound('Space Drone.wav'); currentPage++; renderSpaceGrid(); });
+    prevBtn.addEventListener('click', () => { playSound('Space Drone.wav'); currentPage--; renderSpaceGrid(); });
 
     // --- 8. RETURN ---
     backBtn.addEventListener('click', () => {
