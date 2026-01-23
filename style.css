@@ -358,6 +358,69 @@ option { background: black; }
 #close-panel-btn:hover { background: #ff4444; box-shadow: 0 0 15px red; }
 
 
+/* =========================================
+   CUSTOM SYSTEM TOAST (ALERT REPLACEMENT)
+   ========================================= */
+#system-toast {
+    position: fixed;
+    bottom: -100px; /* Screen ke niche chupa hua */
+    left: 50%;
+    transform: translateX(-50%);
+    
+    background: rgba(0, 10, 20, 0.95);
+    border: 1px solid cyan;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    color: cyan;
+    
+    padding: 15px 25px;
+    border-radius: 5px;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    font-size: 1rem;
+    z-index: 9999; /* Sabse upar */
+    
+    transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smooth Pop-up */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 300px;
+    text-align: center;
+}
 
+/* Jab active hoga tab upar aayega */
+#system-toast.active {
+    bottom: 30px; 
+}
+
+/* Error Mode (Red Color) */
+#system-toast.error {
+    border-color: #ff3333;
+    color: #ff3333;
+    box-shadow: 0 0 20px rgba(255, 51, 51, 0.3);
+}
+
+/* Scanning Line Animation inside Alert */
+.toast-line {
+    width: 0%;
+    height: 2px;
+    background: cyan;
+    transition: width 3s linear; /* Timer bar */
+}
+
+#system-toast.active .toast-line {
+    width: 100%;
+}
+
+#system-toast.error .toast-line {
+    background: #ff3333;
+}
+
+/* Mobile Fix */
+@media screen and (max-width: 480px) {
+    #system-toast {
+        width: 90%;
+        font-size: 0.9rem;
+    }
+}
 
 
