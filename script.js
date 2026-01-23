@@ -268,29 +268,97 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.closePanel = () => { document.getElementById('college-details-panel').style.display = 'none'; };
 
-    // --- 9. MISSION LOG ---
+   // --- 9. MISSION LOG & CAREER GUIDANCE (UPDATED) ---
     const aboutBtn = document.getElementById('open-about');
     const closeAboutBtn = document.getElementById('close-about');
     const aboutModal = document.getElementById('about-modal');
     const typingArea = document.getElementById('typing-area');
     
-    const aboutText = `> SYSTEM: COLLEGEMILEGA PROTOCOL\n> DATA: 2024-25 MERIT LIST\n> STATUS: ONLINE_`;
+    // 🔥 UPDATED TEXT: Positions tool as AI Career Guidance
+    const aboutText = `
+> SYSTEM: COLLEGEMILEGA_V2.0
+> MODULE: AI_CAREER_GUIDANCE
+> DATA SOURCE: 2024-25 MERIT DATABASE
 
-    let i = 0; let typingInterval;
+--------------------------------------------------
+[ 1 ] MISSION OBJECTIVE
+--------------------------------------------------
+To empower engineering aspirants with data-driven career 
+guidance. We eliminate the guesswork from admissions by 
+analyzing multi-year cutoff trends.
+
+--------------------------------------------------
+[ 2 ] HOW TO READ THE DATA
+--------------------------------------------------
+> 🟢 GREEN HEXAGON (SAFE ZONE):
+  High Probability. Your rank qualifies in BOTH 
+  2024 & 2025. Recommended for choice filling.
+
+> 🟠 ORANGE HEXAGON (RISKY ZONE):
+  Borderline Probability. Your rank qualifies in 
+  only ONE year. Keep as backup options.
+
+--------------------------------------------------
+[ 3 ] GUIDANCE INSTRUCTIONS
+--------------------------------------------------
+1. ENTER DETAILS: Input Rank, Category & Course.
+2. ANALYZE: The system filters thousands of records.
+3. DECIDE: Click any college to view specific Cutoffs.
+4. PLAN: Use 'Safe' colleges as your primary targets.
+
+> SYSTEM STATUS: READY FOR QUERY_
+`;
+
+    let i = 0; 
+    let typingInterval;
+
+    // Typewriter Function (Improved)
     function typeWriter() {
         if (i < aboutText.length) {
-            if(aboutText.charAt(i) === '\n') typingArea.innerHTML += '<br>';
-            else typingArea.innerHTML += aboutText.charAt(i);
+            const char = aboutText.charAt(i);
+            
+            // Handle Line Breaks for HTML
+            if (char === '\n') {
+                typingArea.innerHTML += '<br>'; 
+            } else {
+                typingArea.innerHTML += char;
+            }
+            
+            // Auto-scroll to bottom as it types
+            typingArea.scrollTop = typingArea.scrollHeight;
             i++;
-        } else clearInterval(typingInterval);
+        } else {
+            clearInterval(typingInterval); // Stop when done
+        }
     }
 
+    // Open Modal Logic (Resets every time)
     aboutBtn.addEventListener('click', (e) => {
-        e.preventDefault(); aboutModal.classList.add('active'); playSound('ui_click.mp3');
-        typingArea.innerHTML = ''; i = 0; clearInterval(typingInterval);
-        typingInterval = setInterval(typeWriter, 30);
+        e.preventDefault(); 
+        
+        // Show Modal
+        aboutModal.classList.add('active'); 
+        playSound('ui_click.mp3'); 
+        
+        // --- RESET LOGIC (Shuru se shuru) ---
+        typingArea.innerHTML = ''; // Clear old text
+        i = 0; // Reset counter
+        clearInterval(typingInterval); // Stop any running timer
+        
+        // Start Typing (Speed: 15ms)
+        typingInterval = setInterval(typeWriter, 15); 
     });
 
-    closeAboutBtn.addEventListener('click', () => { aboutModal.classList.remove('active'); clearInterval(typingInterval); });
-    aboutModal.addEventListener('click', (e) => { if (e.target === aboutModal) { aboutModal.classList.remove('active'); clearInterval(typingInterval); }});
-});
+    // Close Button Logic
+    closeAboutBtn.addEventListener('click', () => { 
+        aboutModal.classList.remove('active'); 
+        clearInterval(typingInterval); // Stop typing immediately
+    });
+
+    // Outside Click Close Logic
+    aboutModal.addEventListener('click', (e) => { 
+        if (e.target === aboutModal) { 
+            aboutModal.classList.remove('active'); 
+            clearInterval(typingInterval); 
+        }
+    });
