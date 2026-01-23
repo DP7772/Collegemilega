@@ -304,7 +304,16 @@ analyzing multi-year cutoff trends.
 3. DECIDE: Click any college to view specific Cutoffs.
 4. PLAN: Use 'Safe' colleges as your primary targets.
 
-> SYSTEM STATUS: READY FOR QUERY_
+--------------------------------------------------
+[ 4 ] LEGAL & SYSTEM INFO
+--------------------------------------------------
+> DISCLAIMER: Predictions are based on historical 
+  data. Not an official admission authority.
+
+> COPYRIGHT: © 2026 CollegeMilega Systems.
+  All rights reserved.
+
+> SYSTEM STATUS: ONLINE_
 `;
 
     let i = 0; 
