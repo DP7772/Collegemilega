@@ -361,4 +361,34 @@ analyzing multi-year cutoff trends.
         }
     });
 
-}); // End of DOMContentLoaded
+}); 
+
+// --- 10. CONTACT COMMS LINK (NEW) ---
+    const contactBtn = document.querySelector('a[href="#contact"]'); // Navbar Link
+    const contactModal = document.getElementById('contact-modal');
+    const closeContactBtn = document.getElementById('close-contact');
+
+    // Open Contact Modal
+    if(contactBtn) {
+        contactBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            contactModal.classList.add('active');
+            playSound('Sci-Fi.wav'); // Open sound
+        });
+    }
+
+    // Close Contact Modal
+    if(closeContactBtn) {
+        closeContactBtn.addEventListener('click', () => {
+            contactModal.classList.remove('active');
+        });
+    }
+
+    // Outside Click Close
+    contactModal.addEventListener('click', (e) => {
+        if (e.target === contactModal) {
+            contactModal.classList.remove('active');
+        }
+    });
+
+// End of DOMContentLoaded
