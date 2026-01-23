@@ -18,17 +18,48 @@ document.addEventListener("DOMContentLoaded", () => {
     const nextBtn = document.getElementById('next-btn');
     const prevBtn = document.getElementById('prev-btn');
     const backBtn = document.getElementById('back-btn');
-    const filterContainer = document.querySelector('.filter-container'); // To hide filters
+    const filterContainer = document.querySelector('.filter-container'); 
+
+    // Custom Toast Elements
+    const toast = document.getElementById('system-toast');
+    const toastMsg = document.getElementById('toast-message');
+    const toastIcon = document.getElementById('toast-icon');
 
     // Logic Variables
     let currentPage = 0;
     const itemsPerPage = 15;
-    let liveData = []; // Backend data yahan aayega
+    let liveData = []; 
 
     // --- 2. SOUND HANDLER ---
     const playSound = (file) => {
         const audio = new Audio(file);
-        audio.play().catch(e => {}); // Silent catch
+        audio.play().catch(e => {}); 
+    };
+
+    // --- 🔥 NEW: CUSTOM TOAST FUNCTION (With Alertbeep.wav) ---
+    const showToast = (message, isError = false) => {
+        // 1. Text Set Karo
+        toastMsg.innerText = message;
+        
+        // 2. Style Set Karo (Error vs Info)
+        if (isError) {
+            toast.classList.add('error');
+            toastIcon.innerText = "⚠️";
+            // 🔥 Yahan tera sound bajega
+            playSound('Alertbeep.wav'); 
+        } else {
+            toast.classList.remove('error');
+            toastIcon.innerText = "ℹ️";
+            playSound('ui_click.mp3'); 
+        }
+
+        // 3. Show (Slide Up)
+        toast.classList.add('active');
+
+        // 4. Auto Hide after 3 seconds
+        setTimeout(() => {
+            toast.classList.remove('active');
+        }, 3000);
     };
 
     // --- 3. STARFIELD BACKGROUND ---
@@ -79,12 +110,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- 6. LAUNCH & FETCH DATA ---
     launchBtn.addEventListener('click', () => {
-        if(!launchBtn.classList.contains('active')) return;
+        if(!launchBtn.classList.contains('active')) {
+            // 🔥 Error Alert (Plays Alertbeep.wav)
+            showToast("FILL ALL FIELDS TO INITIALIZE WARP!", true); 
+            return;
+        }
 
         playSound('Swoosh.wav');
         hud.style.opacity = '0'; mainText.style.opacity = '0'; magma.style.opacity = '0';
         
-        // Hide Filters initially (Confirmed only mode)
         if(filterContainer) filterContainer.style.display = 'none';
 
         sword.classList.add('launching');
@@ -111,29 +145,30 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => response.json())
         .then(data => {
             if(data.success) {
-                liveData = data.data; // Store Backend Data
+                liveData = data.data; 
                 currentPage = 0;
                 renderSpaceGrid(); 
                 spaceView.classList.add('visible');
                 
-                // Agar koi college nahi mila
                 if(liveData.length === 0) {
-                    alert("No Confirmed Colleges found for this Rank. Try editing inputs.");
-                    backBtn.click();
+                    showToast("NO CONFIRMED COLLEGES FOUND.", true); // 🔥 Error Sound
+                    setTimeout(() => backBtn.click(), 2000);
+                } else {
+                    showToast(`ACCESS GRANTED: ${liveData.length} COLLEGES FOUND`, false); // Success Sound
                 }
             } else {
-                alert("System Error: " + (data.error || "Unknown"));
+                showToast("SYSTEM ERROR: " + (data.error || "Unknown"), true); // 🔥 Error Sound
                 backBtn.click();
             }
         })
         .catch(err => {
             console.error("Fetch Error:", err);
-            alert("Connection Failed. Check Internet.");
+            showToast("CONNECTION FAILED. CHECK INTERNET.", true); // 🔥 Error Sound
             backBtn.click();
         });
     });
 
-    // --- 7. RENDER RESULTS (UPDATED FOR FULL DATA) ---
+    // --- 7. RENDER RESULTS ---
     function renderSpaceGrid() {
         honeycomb.innerHTML = "";
         
@@ -146,8 +181,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         pageItems.forEach((col, index) => {
             const hex = document.createElement('div');
-            
-            // Status Logic (Green/Orange) for Hexagon Border
             const isSafe = col.status.includes('Confirmed');
             hex.className = isSafe ? 'hex safe' : 'hex risky'; 
             hex.style.borderColor = isSafe ? '#00ff00' : '#ffae00';
@@ -158,33 +191,16 @@ document.addEventListener("DOMContentLoaded", () => {
             
             setTimeout(() => { hex.classList.add('show'); }, 50);
             
-            // --- CLICK EVENT: SHOW FULL KUNDLI ---
             hex.addEventListener('click', () => {
                 const panel = document.getElementById('college-details-panel');
                 
-                // --- 🔥 UPDATED HTML STRUCTURE ---
-                // Added Course, Category, and Quota display
                 panel.innerHTML = `
-                    <h2 style="
-                        color: cyan; 
-                        border-bottom: 2px solid cyan; 
-                        padding-bottom: 10px; 
-                        font-size: 1.5rem; 
-                        text-align: center;
-                    ">${col.name}</h2>
+                    <h2 style="color: cyan; border-bottom: 2px solid cyan; padding-bottom: 10px; font-size: 1.5rem; text-align: center;">${col.name}</h2>
                     
-                    <div style="
-                        background: rgba(0,20,40,0.6); 
-                        padding: 15px; 
-                        border-radius: 8px; 
-                        margin: 15px 0; 
-                        text-align: left; 
-                        border: 1px solid cyan;
-                    ">
+                    <div style="background: rgba(0,20,40,0.6); padding: 15px; border-radius: 8px; margin: 15px 0; text-align: left; border: 1px solid cyan;">
                         <p style="margin: 5px 0; font-size: 1.1rem; color: #fff;">
                             <span style="color: cyan; font-weight: bold;">COURSE:</span> ${col.course}
                         </p>
-                        
                         <div style="display: flex; justify-content: space-between; margin-top: 10px;">
                             <p style="margin: 0; color: #ccc;">
                                 <span style="color: cyan; font-weight: bold;">CAT:</span> ${col.category}
@@ -193,21 +209,13 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <span style="color: cyan; font-weight: bold;">QUOTA:</span> ${col.quota}
                             </p>
                         </div>
-                        
                         <p style="margin: 10px 0 0 0; color: #ccc;">
                             <span style="color: cyan; font-weight: bold;">TYPE:</span> ${col.type}
                         </p>
                     </div>
 
                     <div class="detail-row" style="text-align: center; margin: 15px 0;">
-                        <span class="detail-value" style="
-                            color:${isSafe ? '#00ff00' : '#ffae00'}; 
-                            font-size: 1.2rem; 
-                            border: 1px dashed ${isSafe ? '#00ff00' : '#ffae00'}; 
-                            padding: 8px 15px; 
-                            border-radius: 5px;
-                            display: block;
-                        ">
+                        <span class="detail-value" style="color:${isSafe ? '#00ff00' : '#ffae00'}; font-size: 1.2rem; border: 1px dashed ${isSafe ? '#00ff00' : '#ffae00'}; padding: 8px 15px; border-radius: 5px; display: block;">
                             ${col.status}
                         </span>
                     </div>
@@ -225,18 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         </div>
                     </div>
 
-                    <button id="close-panel-btn" onclick="closePanel()" style="
-                        background: linear-gradient(45deg, #ff0000, #990000); 
-                        color: white; 
-                        width: 100%; 
-                        padding: 12px; 
-                        border: none; 
-                        margin-top: 20px; 
-                        cursor: pointer; 
-                        font-weight: bold; 
-                        border-radius: 5px;
-                        box-shadow: 0 0 10px red;
-                    ">CLOSE SYSTEM</button>
+                    <button id="close-panel-btn" onclick="closePanel()" style="background: linear-gradient(45deg, #ff0000, #990000); color: white; width: 100%; padding: 12px; border: none; margin-top: 20px; cursor: pointer; font-weight: bold; border-radius: 5px; box-shadow: 0 0 10px red;">CLOSE SYSTEM</button>
                 `;
                 
                 panel.style.display = 'block';
@@ -246,10 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Window function for closing
-    window.closePanel = () => { 
-        document.getElementById('college-details-panel').style.display = 'none'; 
-    };
+    window.closePanel = () => { document.getElementById('college-details-panel').style.display = 'none'; };
 
     nextBtn.addEventListener('click', () => { playSound('Sci-Fi.wav'); currentPage++; renderSpaceGrid(); });
     prevBtn.addEventListener('click', () => { playSound('Sci-Fi.wav'); currentPage--; renderSpaceGrid(); });
@@ -274,13 +268,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.closePanel = () => { document.getElementById('college-details-panel').style.display = 'none'; };
 
-    // --- 9. NAVBAR & MISSION LOG ---
+    // --- 9. MISSION LOG ---
     const aboutBtn = document.getElementById('open-about');
     const closeAboutBtn = document.getElementById('close-about');
     const aboutModal = document.getElementById('about-modal');
     const typingArea = document.getElementById('typing-area');
     
-    const aboutText = `> SYSTEM: COLLEGEMILEGA PROTOCOL\n> DATA: 2024-25 MERIT LIST\n> MISSION: Showing CONFIRMED admissions based on historical data.\n\n> HOW TO USE:\n1. Enter Rank.\n2. Select Details.\n3. Choose Course.\n4. Click CHECK FUTURE.\n\n> NOTE: Only colleges with high probability are displayed.\n\n> STATUS: ONLINE_`;
+    const aboutText = `> SYSTEM: COLLEGEMILEGA PROTOCOL\n> DATA: 2024-25 MERIT LIST\n> STATUS: ONLINE_`;
 
     let i = 0; let typingInterval;
     function typeWriter() {
