@@ -107,6 +107,9 @@ canvas { position: absolute; top: 0; left: 0; z-index: 0; }
     text-align: center;
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
     opacity: 0; transition: opacity 1s;
+    
+    /* 🔥 GLITCH EFFECT ADDED HERE 🔥 */
+    animation: glitch-anim 5s infinite;
 }
 .title-text.visible { opacity: 1; }
 .subtitle { font-size: 1.2rem; color: cyan; letter-spacing: 5px; margin-top: 10px; }
@@ -192,6 +195,16 @@ option { background: black; }
 @keyframes pulseRed { from { box-shadow: 0 0 5px red; } to { box-shadow: 0 0 20px red; } }
 @keyframes lavaFlow { from { opacity: 0.5; transform: translateX(-50%) scale(1); } to { opacity: 0.9; transform: translateX(-50%) scale(1.1); } }
 @keyframes btnPulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+
+/* 🔥 GLITCH KEYFRAMES ADDED HERE 🔥 */
+@keyframes glitch-anim {
+    0% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.8); transform: translate(0); }
+    92% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.8); transform: translate(0); }
+    93% { text-shadow: 2px 0 red, -2px 0 blue; transform: translate(-2px, 1px); }
+    94% { text-shadow: -2px 0 red, 2px 0 blue; transform: translate(2px, -1px); }
+    95% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.8); transform: translate(0); }
+    100% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.8); transform: translate(0); }
+}
 
 .shake { animation: shakeScreen 0.5s ease-in-out; }
 @keyframes shakeScreen { 0%,100% { transform: translate(0,0); } 25% { transform: translate(-5px, 5px); } 75% { transform: translate(5px, -5px); } }
@@ -546,4 +559,4 @@ option { background: black; }
     color: #555;
     font-size: 0.6rem;
     letter-spacing: 1px;
-}
+                           }
