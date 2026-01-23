@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
         audio.play().catch(e => {}); 
     };
 
-    // --- 🔥 NEW: CUSTOM TOAST FUNCTION (With Alertbeep.wav) ---
+    // --- 🔥 NEW: CUSTOM TOAST FUNCTION ---
     const showToast = (message, isError = false) => {
         // 1. Text Set Karo
         toastMsg.innerText = message;
@@ -45,7 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isError) {
             toast.classList.add('error');
             toastIcon.innerText = "⚠️";
-            // 🔥 Yahan tera sound bajega
             playSound('Alertbeep.wav'); 
         } else {
             toast.classList.remove('error');
@@ -111,7 +110,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- 6. LAUNCH & FETCH DATA ---
     launchBtn.addEventListener('click', () => {
         if(!launchBtn.classList.contains('active')) {
-            // 🔥 Error Alert (Plays Alertbeep.wav)
             showToast("FILL ALL FIELDS TO INITIALIZE WARP!", true); 
             return;
         }
@@ -151,19 +149,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 spaceView.classList.add('visible');
                 
                 if(liveData.length === 0) {
-                    showToast("NO CONFIRMED COLLEGES FOUND.", true); // 🔥 Error Sound
+                    showToast("NO CONFIRMED COLLEGES FOUND.", true); 
                     setTimeout(() => backBtn.click(), 2000);
                 } else {
-                    showToast(`ACCESS GRANTED: ${liveData.length} COLLEGES FOUND`, false); // Success Sound
+                    showToast(`ACCESS GRANTED: ${liveData.length} COLLEGES FOUND`, false); 
                 }
             } else {
-                showToast("SYSTEM ERROR: " + (data.error || "Unknown"), true); // 🔥 Error Sound
+                showToast("SYSTEM ERROR: " + (data.error || "Unknown"), true);
                 backBtn.click();
             }
         })
         .catch(err => {
             console.error("Fetch Error:", err);
-            showToast("CONNECTION FAILED. CHECK INTERNET.", true); // 🔥 Error Sound
+            showToast("CONNECTION FAILED. CHECK INTERNET.", true);
             backBtn.click();
         });
     });
@@ -268,7 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.closePanel = () => { document.getElementById('college-details-panel').style.display = 'none'; };
 
-   // --- 9. MISSION LOG & CAREER GUIDANCE (UPDATED) ---
+    // --- 9. MISSION LOG & CAREER GUIDANCE (FINAL CORRECTED) ---
     const aboutBtn = document.getElementById('open-about');
     const closeAboutBtn = document.getElementById('close-about');
     const aboutModal = document.getElementById('about-modal');
@@ -362,3 +360,5 @@ analyzing multi-year cutoff trends.
             clearInterval(typingInterval); 
         }
     });
+
+}); // End of DOMContentLoaded
